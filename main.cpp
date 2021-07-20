@@ -10,6 +10,8 @@
 #include "Graph.h"
 #include "Node.h"
 
+// teste
+
 using namespace std;
 
 Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
