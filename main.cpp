@@ -28,10 +28,11 @@ Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weighte
     //Leitura de arquivo
 
     if(!graph->getWeightedEdge() && !graph->getWeightedNode()){
-
+        int c = 1;
         while(input_file >> idNodeSource >> idNodeTarget) {
 
             graph->insertEdge(idNodeSource, idNodeTarget, 0);
+
         }        
 
     }else if(graph->getWeightedEdge() && !graph->getWeightedNode() ){
