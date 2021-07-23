@@ -8,12 +8,13 @@
 using namespace std;
 
 // Definition of the Edge class
+//Arestas
 class Edge{
 
     // Attributes
     private:
         int target_id;
-        Edge* next_edge;
+        Edge* next_edge; //pr�xima aresta.
         float weight;
 
     public:
@@ -22,13 +23,13 @@ class Edge{
         // Destructor
         ~Edge();
         // Getters
-        int getTargetId();
-        Edge* getNextEdge();
-        float getWeight();
+        int getTargetId(); //id da aresta
+        Edge* getNextEdge(); //ponteiro para pr�xima aresta
+        float getWeight(); //peso da aresta
         // Setters
         void setNextEdge(Edge* edge);
-        void setWeight(float weight); 
+        void setWeight(float weight);
 
-}; 
+};
 
 #endif // EDGE_H_INCLUDED

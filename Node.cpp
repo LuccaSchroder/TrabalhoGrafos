@@ -95,9 +95,9 @@ void Node::setWeight(float weight){
 
 // Other methods
 void Node::insertEdge(int target_id, float weight){
-    // Verifies whether there are at least one edge in the node
+    // Verifies whether there are at least one edge in the node (Verifica se existe pelo menos uma aresta no n�)
     if(this->first_edge != nullptr){
-        // Allocating the new edge and keeping the integrity of the edge list
+        // Allocating the new edge and keeping the integrity of the edge list (Alocando a nova aresta e mantendo a integridade de lista de arestas)
         Edge* edge = new Edge(target_id);
         edge->setWeight(weight);
         this->last_edge->setNextEdge(edge);
@@ -125,8 +125,9 @@ void Node::removeAllEdges(){
 
             next = aux->getNextEdge();
             delete aux;
+            //aux = next;
 
-        }
+        }///fun��o duvidosa (n�o teria que atualizar aux?)
 
     }
 

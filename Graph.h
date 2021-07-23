@@ -44,9 +44,10 @@ class Graph{
         Node* getNode(int id);
 
         //methods phase1
+        Node* fechoDireto(int id);
         void topologicalSorting();
         void breadthFirstSearch(ofstream& output_file);
-        Graoh* getVertexInduced(int* listIdNodes);
+        Graph* getVertexInduced(int* listIdNodes);
         Graph* agmKuskal();
         Graph* agmPrim();
         float floydMarshall(int idSource, int idTarget);
