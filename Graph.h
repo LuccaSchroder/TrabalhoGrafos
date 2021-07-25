@@ -44,7 +44,7 @@ class Graph{
         Node* getNode(int id);
 
         //methods phase1
-        Node* fechoDireto(int id);
+        void fechoDireto(int id);
         void topologicalSorting();
         void breadthFirstSearch(ofstream& output_file);
         Graph* getVertexInduced(int* listIdNodes);
@@ -59,7 +59,9 @@ class Graph{
         float greedRactiveRandom();
     private:
         //Auxiliar methods
-
+        void auxFechoDireto(list<int>* lista, int id, Node* node);
+        void imprimeLista (list<int>* lista);
+        bool pesquisaNaLista(list<int>* lista, int id);
 };
 
 #endif // GRAPH_H_INCLUDED

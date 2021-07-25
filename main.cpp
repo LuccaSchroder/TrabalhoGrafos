@@ -98,6 +98,17 @@ Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, in
     return graph;
 }
 
+//Funcao auxiliar fecho transitivo direto.
+void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
+    int vertice;
+
+    cout << "Digite o ID do vertice: " << endl;
+    cin >> vertice; 
+
+    graph->fechoDireto(vertice);
+    
+}
+
 int menu(){
 
     int selecao;
@@ -111,9 +122,10 @@ int menu(){
     cout << "[5] Árvore Geradora Mínima de Kruskal" << endl;
     cout << "[6] Imprimir caminhamento em largura" << endl;
     cout << "[7] Imprimir ordenacao topológica" << endl;
-    cout << "[8] Algoritmo Guloso" << endl;
-    cout << "[9] Algoritmo Guloso Randomizado " << endl;
-    cout << "[10] Algoritmo Guloso Randomizado Reativo" << endl;
+    cout << "[8] Imprimir Fecho Transitivo Direto de um vertice" << endl;
+    cout << "[9] Algoritmo Guloso" << endl;
+    cout << "[10] Algoritmo Guloso Randomizado " << endl;
+    cout << "[11] Algoritmo Guloso Randomizado Reativo" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -121,6 +133,7 @@ int menu(){
     return selecao;
 
 }
+
 
 void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
@@ -168,6 +181,13 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
             break;
         }
+            //Fecho transitivo direto do vertice;
+        case 8:{
+            verticeTransitivoDireto(graph, output_file);
+
+            break;
+        }
+
         default:
         {
             cout << " Error!!! invalid option!!" << endl;

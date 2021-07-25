@@ -11,6 +11,7 @@
 #include <ctime>
 #include <float.h>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
@@ -89,6 +90,16 @@ Node *Graph::getLastNode()
     return this->last_node;
 }
 
+Node *Graph::getNode(int id)
+{
+    if(this->searchNode(id)){
+        for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
+            if(aux->getId() == id)
+                return aux;
+    }
+    return nullptr;
+}
+
 // Other methods
 /*
     The outdegree attribute of nodes is used as a counter for the number of edges in the graph.
@@ -153,20 +164,62 @@ bool Graph::searchNode(int id)
     return false;
 }
 
-Node *Graph::getNode(int id)
-{
-    if(this->searchNode(id)){
-        for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
-            if(aux->getId() == id)
-                return aux;
+//Imprime uma lista do tipo list.
+void Graph::imprimeLista (list<int>* lista){
+    list<int>::iterator it;
+
+    for (it = lista->begin(); it != lista->end(); it++) {
+        cout << *it << endl;
     }
-    return nullptr;
 }
 
-/*Node *Graph::fechoDireto(int id){
+bool Graph::pesquisaNaLista(list<int>* lista, int id){
+    list<int>::iterator find;
 
-    return nullptr;
-}*/
+    find = std::find(lista->begin(), lista->end(), id);
+    
+    if (find != lista->end())
+        return true;
+    else
+        return false;
+}
+
+void Graph::auxFechoDireto(list<int>* lista, int id, Node* node) { 
+    
+    for (Edge* vizinho = node->getFirstEdge(); vizinho != nullptr; vizinho = vizinho->getNextEdge()) {
+            //Verificar se elemento existe na lista,  caso exista não inserir.
+
+            //Adiciona vertice na lista.
+            if( !this->pesquisaNaLista( lista, vizinho->getTargetId() ))
+                lista->push_back( vizinho->getTargetId() );
+
+            //Seleciona vertice vizinho.
+            Node* aux = getNode( vizinho->getTargetId() );
+
+            //Funacao recursiva.
+            auxFechoDireto(lista, aux->getId(), aux);       
+    }
+
+}
+
+void Graph::fechoDireto(int id){
+    Node* node = this->getNode(id);
+    list<int> *lista;
+    lista = new list<int>;
+
+    //Garante que o grafo é direcionado e que o vertice tenha pelo menos um vizinho.
+    if(this->getDirected()) {
+        
+        if(node->getOutDegree() > 0 ){
+            auxFechoDireto(lista, id, node);
+            this->imprimeLista(lista);
+        } else 
+            cout << "Vertice nao alcança nenhum outro" << endl;
+        
+    } else
+        cout << "Grafo nao direcionado" << endl;
+    
+}
 
 /*
 //Function that prints a set of edges belongs breadth tree
