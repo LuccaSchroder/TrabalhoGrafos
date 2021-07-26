@@ -109,6 +109,34 @@ void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     
 }
 
+//Funcao auxiliar grafo vertice induzido.
+void subgrafoInduzido(Graph* graph, ofstream& output_file){
+    int quantVertices;
+    Graph* vInduzido;
+    
+    cout << "Quantos vertice?" << endl;
+    cin >> quantVertices;
+    
+    int* listIdNodes = new int [quantVertices];
+
+    cout << "Digite o ID dos vertices" << endl;
+    for(int i = 0; i < quantVertices; i++){
+        cin >> listIdNodes[i];
+    }
+
+    vInduzido = graph->getVertexInduced(listIdNodes, quantVertices);
+
+    cout << "Ordem: " << vInduzido->getOrder() << endl;
+    cout << "Arestas: " << endl;
+    for (Node* node = vInduzido->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            cout << node->getId() << " " << edge->getTargetId() << endl; 
+        }
+    }
+
+    delete [] listIdNodes;
+}
+
 int menu(){
 
     int selecao;
@@ -141,7 +169,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
         //Subgrafo induzido por um conjunto de vértices X;
         case 1:{
-
+            subgrafoInduzido(graph, output_file);
             break;
         }
             //Caminho mínimo entre dois vértices usando Dijkstra;
@@ -184,7 +212,6 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             //Fecho transitivo direto do vertice;
         case 8:{
             verticeTransitivoDireto(graph, output_file);
-
             break;
         }
 

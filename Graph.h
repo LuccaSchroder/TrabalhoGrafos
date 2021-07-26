@@ -47,7 +47,7 @@ class Graph{
         void fechoDireto(int id);
         void topologicalSorting();
         void breadthFirstSearch(ofstream& output_file);
-        Graph* getVertexInduced(int* listIdNodes);
+        Graph* getVertexInduced(int* listIdNodes, int ordem);
         Graph* agmKuskal();
         Graph* agmPrim();
         float floydMarshall(int idSource, int idTarget);
@@ -62,6 +62,7 @@ class Graph{
         void auxFechoDireto(list<int>* lista, int id, Node* node);
         void imprimeLista (list<int>* lista);
         bool pesquisaNaLista(list<int>* lista, int id);
+        bool buscaVetor(int* listIdNodes, int id, int ordem);
 };
 
 #endif // GRAPH_H_INCLUDED

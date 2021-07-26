@@ -221,9 +221,45 @@ void Graph::fechoDireto(int id){
     
 }
 
-/*
+
 //Function that prints a set of edges belongs breadth tree
 
+bool Graph::buscaVetor(int* listIdNode, int id, int ordem){
+    for(int i = 0; i < ordem; i++){
+        if(listIdNode[i] == id)
+            return true;
+    }
+    return false;
+}
+
+Graph* Graph::getVertexInduced(int* listIdNodes, int ordem){
+    Graph* vInduzido = new Graph(ordem, this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+
+    Node *node, *original;
+
+    if(ordem <= 0) return nullptr;
+
+    //Para cada vertice da lista.
+    for(int i = 0; i < ordem; i++){
+        vInduzido->insertNode( listIdNodes[i] );
+        //Vertice para o novo grafo.
+        node = vInduzido->getNode( listIdNodes[i] );
+        
+        //Vertice do grafo original.
+        original = this->getNode( listIdNodes[i] );
+
+        for(Edge* edge = original->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            if( buscaVetor(listIdNodes, edge->getTargetId(), ordem) ){
+
+                node->insertEdge( edge->getTargetId(), node->getWeight());
+                listIdNodes[i] = -1;
+            }
+        }
+    }
+    return vInduzido;
+}
+
+/*
 void Graph::breadthFirstSearch(ofstream &output_file){
 
 }
@@ -246,9 +282,6 @@ void topologicalSorting(){
 }
 
 void breadthFirstSearch(ofstream& output_file){
-
-}
-Graph* getVertexInduced(int* listIdNodes){
 
 }
 
