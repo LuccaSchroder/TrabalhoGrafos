@@ -11,7 +11,7 @@
 #include "Node.h"
 
 using namespace std;
-//teste
+//test
 Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
 
     //Variáveis para auxiliar na criação dos nós no Grafo
