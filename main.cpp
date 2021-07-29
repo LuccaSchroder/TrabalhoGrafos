@@ -137,6 +137,29 @@ void subgrafoInduzido(Graph* graph, ofstream& output_file){
     delete [] listIdNodes;
 }
 
+//Caminhamento em profundidade.
+void caminhoProfund(Graph* graph, ofstream& output_file){
+    Graph* arvore;
+    int vertice;
+
+    cout << "Digite o ID do vertice" << endl;
+    cin >> vertice;
+
+    arvore = graph->caminhoProfund(vertice);
+
+    output_file << "strict graph {" << endl;
+
+    for(Node* node = arvore->getFirstNode(); node != nullptr; node = node->getNextNode()){
+       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+       {
+            cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
+            output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
+       }
+    }
+    output_file << "}" << endl;
+
+}
+
 int menu(){
 
     int selecao;
@@ -151,9 +174,10 @@ int menu(){
     cout << "[6] Imprimir caminhamento em largura" << endl;
     cout << "[7] Imprimir ordenacao topológica" << endl;
     cout << "[8] Imprimir Fecho Transitivo Direto de um vertice" << endl;
-    cout << "[9] Algoritmo Guloso" << endl;
-    cout << "[10] Algoritmo Guloso Randomizado " << endl;
-    cout << "[11] Algoritmo Guloso Randomizado Reativo" << endl;
+    cout << "[9] Caminhamento em Profundidade" << endl;
+    cout << "[10] Algoritmo Guloso" << endl;
+    cout << "[11] Algoritmo Guloso Randomizado " << endl;
+    cout << "[12] Algoritmo Guloso Randomizado Reativo" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -214,7 +238,10 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             verticeTransitivoDireto(graph, output_file);
             break;
         }
-
+        case 9:{
+            caminhoProfund(graph, output_file);
+            break;
+        }
         default:
         {
             cout << " Error!!! invalid option!!" << endl;

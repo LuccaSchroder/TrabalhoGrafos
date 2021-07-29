@@ -259,6 +259,53 @@ Graph* Graph::getVertexInduced(int* listIdNodes, int ordem){
     return vInduzido;
 }
 
+void Graph::auxCaminhoProfund(int id, Graph* graph, list<int>* auxList, list<Edge>* arestas){
+    Node* node = this->getNode(id);
+    
+    for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+    {
+        //Adiciona vertice ao grafo que nao foram inseridos ainda e adiciona na lista.
+        //lista armazena vertices ja visitados.
+        if( !pesquisaNaLista(auxList, node->getId()) ){
+            auxList->push_back( node->getId() );
+            graph->insertNode( node->getId() );
+        }    
+        
+        //Adiciona arestas ao grafo.
+        if( !pesquisaNaLista(auxList, edge->getTargetId()) ){
+            auxList->push_back( edge->getTargetId() );
+            graph->insertEdge(node->getId(), edge->getTargetId(),edge->getWeight());            
+            
+            //Chamando funcao recursiva.
+            auxCaminhoProfund(edge->getTargetId(), graph, auxList, arestas);
+        
+        //Arestas de retorno.
+        } else { 
+            //Para evitar que as arestas duplicadas sejam consideradas arestas de retorno.
+            if( !graph->getNode( edge->getTargetId() )->searchEdge( node->getId() ) )
+                arestas->push_back(*edge);
+        }   
+    }
+}
+
+Graph* Graph::caminhoProfund(int id){
+    Graph* graph = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+    list<int>* auxList = new list<int>;
+    list<Edge>* arestasRet = new list<Edge>;
+
+    auxCaminhoProfund(id, graph, auxList, arestasRet);
+
+    list<Edge>::iterator it;
+
+    cout << "---------- Arestas de Retorno ----------" << endl;
+    for (it = arestasRet->begin(); it != arestasRet->end(); it++)
+    {
+        cout << it->getIdNode() << " " << it->getTargetId() <<endl;
+    }
+
+    return graph;
+}
+
 /*
 void Graph::breadthFirstSearch(ofstream &output_file){
 

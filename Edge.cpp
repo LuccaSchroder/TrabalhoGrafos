@@ -8,9 +8,10 @@ using namespace std;
 **************************************************************************************************/
 
 // Constructor
-Edge::Edge(int target_id){
+Edge::Edge(int target_id, int id_node){
 
     this->target_id = target_id;
+    this->id_node = id_node;
     this->next_edge = nullptr;
     this->weight = 0;
 
@@ -30,6 +31,12 @@ Edge::~Edge(){
 int Edge::getTargetId(){
 
     return this->target_id;
+
+}
+
+int Edge::getIdNode(){
+    
+    return this->id_node;
 
 }
 
