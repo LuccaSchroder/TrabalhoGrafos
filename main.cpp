@@ -160,6 +160,10 @@ void caminhoProfund(Graph* graph, ofstream& output_file){
 
 }
 
+void ordenacaoTopologica(Graph* graph, ofstream& output_file){
+    graph->topologicalSorting();
+}
+
 int menu(){
 
     int selecao;
@@ -229,8 +233,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
             //Ordenação Topologica;
         case 7:{
-
-
+            ordenacaoTopologica(graph, output_file);
             break;
         }
             //Fecho transitivo direto do vertice;

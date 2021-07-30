@@ -47,7 +47,7 @@ class Graph{
         void fechoDireto(int id);
         Graph* caminhoProfund(int id);
         void topologicalSorting();
-        void breadthFirstSearch(ofstream& output_file);
+        //void breadthFirstSearch(ofstream& output_file);
         Graph* getVertexInduced(int* listIdNodes, int ordem);
         Graph* agmKuskal();
         Graph* agmPrim();
@@ -65,6 +65,7 @@ class Graph{
         bool pesquisaNaLista(list<int>* lista, int id);
         void auxCaminhoProfund(int id, Graph* graph, list<int>* auxList, list<Edge>* arestas);
         bool buscaVetor(int* listIdNodes, int id, int ordem);
+        bool cicloGrafo(int id, list<int>* lista, list<int>* pilha);
 };
 
 #endif // GRAPH_H_INCLUDED

@@ -306,25 +306,56 @@ Graph* Graph::caminhoProfund(int id){
     return graph;
 }
 
-/*
-void Graph::breadthFirstSearch(ofstream &output_file){
+bool Graph::cicloGrafo(int id, list<int>* lista, list<int>* pilha){
+    Node* node = this->getNode(id);
+    bool temCiclo;
 
+    pilha->push_front(node->getId());
+
+    if(node->getOutDegree() > 0){
+        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            
+            //Procura na pilha para ver se vertice ja foi visitado.
+            if( pesquisaNaLista(pilha, edge->getTargetId()) )
+                return true;
+            
+            //se vertice estiver na lista todos seus vizinhos ja foram visitados e ele nao faz parte de nenhum ciclo.
+            if( !pesquisaNaLista(lista, edge->getTargetId()) ){
+                temCiclo = cicloGrafo(edge->getTargetId(), lista, pilha);
+                
+                if(temCiclo) 
+                    return true;
+            }
+        }
+    }
+    //vertices que nao fazem parte de nunhum ciclo.
+    else{
+        lista->push_back(node->getId()); //adiciona a lista para nao procurar nos vizinhos dele novamente.
+        pilha->pop_front(); //remove da lista.
+        return false;
+    }
+    return false; //foi adicionado porque aparece warning no terminal.
+} 
+
+//function that prints a topological sorting
+void Graph::topologicalSorting(){
+    //armazena vertices que nao pertencem a nunhum ciclo. (nao precisarao ser visitados novamente)
+    list<int>* lista = new list<int>;
+    //armazena sequencia de vertice para testar se forma um ciclo.
+    list<int>* auxLista = new list<int>;
+
+    if(cicloGrafo(this->getFirstNode()->getId(), lista, auxLista))
+        cout << "Grafo tem ciclo" << endl;
+    else 
+        cout << "Grafo nao tem ciclo" << endl;
 }
 
-
-
+/*
 float Graph::floydMarshall(int idSource, int idTarget){
 
 }
 
-
-
 float Graph::dijkstra(int idSource, int idTarget){
-
-}
-
-//function that prints a topological sorting
-void topologicalSorting(){
 
 }
 
