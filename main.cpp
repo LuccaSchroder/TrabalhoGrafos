@@ -147,13 +147,19 @@ void caminhoProfund(Graph* graph, ofstream& output_file){
 
     arvore = graph->caminhoProfund(vertice);
 
-    output_file << "strict graph {" << endl;
+    if ( !arvore->getDirected() ) output_file << "strict graph {" << endl;
+    else output_file << "digraph graphname {" << endl;
 
     for(Node* node = arvore->getFirstNode(); node != nullptr; node = node->getNextNode()){
        for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
        {
-            cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
-            output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
+           if(arvore->getDirected()){
+                cout << node->getId() << "->" << edge->getTargetId() << ";" << endl;
+                output_file <<  node->getId() << "->" << edge->getTargetId() << endl;
+            } else {
+                cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
+                output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
+            }
        }
     }
     output_file << "}" << endl;
@@ -161,7 +167,14 @@ void caminhoProfund(Graph* graph, ofstream& output_file){
 }
 
 void ordenacaoTopologica(Graph* graph, ofstream& output_file){
-    graph->topologicalSorting();
+    list<int>* ordem;
+    
+    ordem = graph->topologicalSorting();
+    
+    for (list<int>::iterator it = ordem->begin(); it != ordem->end(); it++) {
+        cout << *it << " ";
+    }
+    cout << endl;
 }
 
 int menu(){

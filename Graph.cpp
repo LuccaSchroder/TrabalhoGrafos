@@ -302,6 +302,7 @@ Graph* Graph::caminhoProfund(int id){
     {
         cout << it->getIdNode() << " " << it->getTargetId() <<endl;
     }
+    cout << "----------------------------------------" << endl;
 
     return graph;
 }
@@ -338,16 +339,61 @@ bool Graph::cicloGrafo(int id, list<int>* lista, list<int>* pilha){
 } 
 
 //function that prints a topological sorting
-void Graph::topologicalSorting(){
-    //armazena vertices que nao pertencem a nunhum ciclo. (nao precisarao ser visitados novamente)
-    list<int>* lista = new list<int>;
-    //armazena sequencia de vertice para testar se forma um ciclo.
-    list<int>* auxLista = new list<int>;
+list<int>* Graph::topologicalSorting(){
+    //lista de retorno.
+    list<int>* ordem = new list<int>;
 
-    if(cicloGrafo(this->getFirstNode()->getId(), lista, auxLista))
-        cout << "Grafo tem ciclo" << endl;
-    else 
-        cout << "Grafo nao tem ciclo" << endl;
+    if(this->getDirected()){
+        if(this->getOrder() > 0){
+            //armazena vertices que nao pertencem a nunhum ciclo. (nao precisarao ser visitados novamente)
+            list<int>* lista = new list<int>;
+            //armazena sequencia de vertice para testar se forma um ciclo. (similar a uma pilha)
+            list<int>* auxLista = new list<int>;
+
+            if( !cicloGrafo(this->getFirstNode()->getId(), lista, auxLista) ){
+                //Grafo nao tem nenhum ciclo (e uma DAG).
+                //Inicializa vetor que armazena grau de entrada dos vertices com 0.
+                int gEntrada[this->getOrder()];
+                for(int i = 0; i < this->getOrder(); i++){
+                    gEntrada[i] = 0;
+                }
+                //adiciona ao vetor grau de entrada de cada vertice.
+                for( Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode() ){
+                    for( Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge() ){
+                        gEntrada[ edge->getTargetId() - 1]++;
+                    }
+                }
+
+                list<int>* lista = new list<int>;
+
+                for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+                    //condicao funciona apenas se os indices dos vertices do grafo forem ordenados de 1 a n;
+                    if(gEntrada[ node->getId() - 1 ] == 0)
+                        lista->push_back( node->getId() );
+                }
+                while ( lista->begin() != lista->end() ){
+                    //adiciona primeiro elemento de lista na ordem e depois o remove.
+                    list<int>::iterator it = lista->begin();
+                    ordem->push_back(*it);
+
+                    Node* node = this->getNode(*it);
+                    lista->pop_front();
+
+                    for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+                        gEntrada[ edge->getTargetId() - 1 ]--;
+
+                        if( gEntrada[ edge->getTargetId() - 1] == 0 && !pesquisaNaLista(ordem, edge->getTargetId())) 
+                            lista->push_back( edge->getTargetId() );
+                    }
+                } 
+
+            }else cout << "Grafo possui ciclo(s)" << endl;
+            
+        } else cout << "Grafo vazio" << endl;
+
+    } else cout << "Grafo nao e direcionado." << endl;
+
+    return ordem; 
 }
 
 /*

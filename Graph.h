@@ -46,7 +46,7 @@ class Graph{
         //methods phase1
         void fechoDireto(int id);
         Graph* caminhoProfund(int id);
-        void topologicalSorting();
+        list<int>* topologicalSorting();
         //void breadthFirstSearch(ofstream& output_file);
         Graph* getVertexInduced(int* listIdNodes, int ordem);
         Graph* agmKuskal();
