@@ -177,6 +177,16 @@ void ordenacaoTopologica(Graph* graph, ofstream& output_file){
     cout << endl;
 }
 
+void caminhoMinFloyd(Graph* graph, ofstream& output_file){
+    int a, b;
+
+    cout << "Digite o ID dos vertices" << endl;
+    cin >> a >> b;
+
+    float cam = graph->floydMarshall(a, b);
+    cout << "O caminho minimo entre os dois vertices e " << cam << endl << endl;
+}
+
 int menu(){
 
     int selecao;
@@ -221,7 +231,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
             //Caminho mínimo entre dois vértices usando Floyd;
         case 3:{
-
+            caminhoMinFloyd(graph, output_file);
             break;
         }
 

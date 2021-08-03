@@ -106,9 +106,7 @@ Node *Graph::getNode(int id)
     This allows the correct updating of the numbers of edges in the graph being directed or not.
 */
 void Graph::insertNode(int id)
-{
-    //Precisa inserir peso tem que passar no parametro.
-    
+{   
     // Verifica se ja existe algum vertice no grafo.
     if(!this->searchNode(id)){
         Node* node = new Node(id);
@@ -131,21 +129,18 @@ void Graph::insertEdge(int id, int target_id, float weight)
     this->insertNode(id);
     this->insertNode(target_id);
 
-    // Procurando vertice para adicionar aresta.
-    for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode()){
-        if(aux->getId() == id){
-            aux->insertEdge(target_id, weight);
-            aux->incrementOutDegree();
-        }
-        if(aux->getId() == target_id){
-            // Caso o grafo não seja direcionado.
-            if(!this->getDirected()){
-                aux->insertEdge(id, weight);
-                aux->incrementOutDegree();
-            } else 
-                aux->incrementInDegree();
-        }
-    }
+    Node* node = this->getNode(id);
+    node->insertEdge(target_id, weight);
+    node->incrementOutDegree();
+        
+    // Caso o grafo não seja direcionado.
+    if( !this->getDirected() ){
+        node = this->getNode(target_id);
+        node->insertEdge(id, weight);
+        node->incrementOutDegree();
+    } else 
+        node->incrementInDegree();
+    
 }
 
 void Graph::removeNode(int id){
@@ -396,11 +391,54 @@ list<int>* Graph::topologicalSorting(){
     return ordem; 
 }
 
-/*
-float Graph::floydMarshall(int idSource, int idTarget){
 
+float Graph::floydMarshall(int idSource, int idTarget){
+    float inf = numeric_limits<float>::max();
+    float matriz[this->getOrder()][this->getOrder()];
+    Node *node;
+    Edge *edge;
+    //Verifica se os dois vertices existe no grafo.
+    if( this->getNode(idSource) == nullptr || this->getNode(idTarget) == nullptr ){
+        cout << "Erro: Nao existe vertice com Id inserido" << endl;
+        exit(1);
+    }
+    //Funciona apenas se os vertices do grafo tiver ids ordenados de 1 a n.
+    for(int i = 0; i < this->getOrder(); i++){
+        node = this->getNode(i + 1);
+
+        for(int j = 0; j < this->getOrder(); j++){
+            edge = node->hasEdgeBetween(j + 1);
+            if(i == j)
+                matriz[i][j] = 0;
+            else {
+                if(edge != nullptr){
+                    matriz[i][j] = edge->getWeight();
+                    //cout << "Peso da aresta " << edge->getWeight() << endl;
+                }
+                else
+                    matriz[i][j] = 10000;
+            }
+        }
+    }
+    for(int k = 1; k < this->getOrder(); k++){
+        for(int i = 0; i < this->getOrder(); i++){
+            for(int j = 0; j < this->getOrder(); j++){
+                if(matriz[i][k] + matriz[k][j] < matriz[i][j]){
+                    matriz[i][j] = matriz[i][k] + matriz[k][j];
+                }
+            }
+        }
+    }
+    for(int i = 0; i < this->getOrder(); i++){
+        for(int j = 0; j < this->getOrder(); j++)
+            cout << matriz[i][j] << " \t";
+        cout << endl;
+    }
+
+    return matriz[idSource][idTarget];
 }
 
+/*
 float Graph::dijkstra(int idSource, int idTarget){
 
 }

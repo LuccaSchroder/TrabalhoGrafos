@@ -96,21 +96,22 @@ void Node::setWeight(float weight){
 // Other methods
 void Node::insertEdge(int target_id, float weight){
     // Verifies whether there are at least one edge in the node (Verifica se existe pelo menos uma aresta no n�)
-    if(this->first_edge != nullptr){
-        // Allocating the new edge and keeping the integrity of the edge list (Alocando a nova aresta e mantendo a integridade de lista de arestas)
-        Edge* edge = new Edge(target_id, this->getId());
-        edge->setWeight(weight);
-        this->last_edge->setNextEdge(edge);
-        this->last_edge = edge;
-
-    }
-    else{
-         // Allocating the new edge and keeping the integrity of the edge list
-        this->first_edge = new Edge(target_id, this->getId());
-        this->first_edge->setWeight(weight);
-        this->last_edge = this->first_edge;
-
-    }
+    if( !this->searchEdge(target_id) ){
+        if(this->first_edge != nullptr){
+            // Allocating the new edge and keeping the integrity of the edge list (Alocando a nova aresta e mantendo a integridade de lista de arestas)
+            Edge* edge = new Edge(target_id, this->getId());
+            edge->setWeight(weight);
+            this->last_edge->setNextEdge(edge);
+            this->last_edge = edge;
+        
+        } else {
+            // Allocating the new edge and keeping the integrity of the edge list
+            this->first_edge = new Edge(target_id, this->getId());
+            this->first_edge->setWeight(weight);
+            this->last_edge = this->first_edge;
+        }
+    } else 
+        cout << "-------Aresta " << this->getId() << " " << target_id << " ja existe no grafo-------" << endl;
 
 }
 
