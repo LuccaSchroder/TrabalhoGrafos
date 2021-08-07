@@ -98,6 +98,29 @@ Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, in
     return graph;
 }
 
+//Função para escrever no arquivo.
+void escreveArquivo(Graph* graph, ofstream& output_file){
+    
+    if ( !graph->getDirected() ) 
+        output_file << "strict graph {" << endl;
+    else 
+        output_file << "digraph graphname {" << endl;
+
+    for(Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
+       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+       {
+           if(graph->getDirected()){
+                cout << node->getId() << "->" << edge->getTargetId() << ";" << endl;
+                output_file <<  node->getId() << "->" << edge->getTargetId() << endl;
+            } else {
+                cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
+                output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
+            }
+       }
+    }
+    output_file << "}" << endl;
+}
+
 //Funcao auxiliar fecho transitivo direto.
 void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     int vertice;
@@ -147,23 +170,7 @@ void caminhoProfund(Graph* graph, ofstream& output_file){
 
     arvore = graph->caminhoProfund(vertice);
 
-    if ( !arvore->getDirected() ) output_file << "strict graph {" << endl;
-    else output_file << "digraph graphname {" << endl;
-
-    for(Node* node = arvore->getFirstNode(); node != nullptr; node = node->getNextNode()){
-       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
-       {
-           if(arvore->getDirected()){
-                cout << node->getId() << "->" << edge->getTargetId() << ";" << endl;
-                output_file <<  node->getId() << "->" << edge->getTargetId() << endl;
-            } else {
-                cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
-                output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
-            }
-       }
-    }
-    output_file << "}" << endl;
-
+    escreveArquivo(arvore, output_file);
 }
 
 void ordenacaoTopologica(Graph* graph, ofstream& output_file){
@@ -180,11 +187,24 @@ void ordenacaoTopologica(Graph* graph, ofstream& output_file){
 void caminhoMinFloyd(Graph* graph, ofstream& output_file){
     int a, b;
 
-    cout << "Digite o ID dos vertices" << endl;
+    cout << "Digite o ID dos vertices: " << endl;
     cin >> a >> b;
 
     float cam = graph->floydMarshall(a, b);
-    cout << "O caminho minimo entre os dois vertices e " << cam << endl << endl;
+    cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
+}
+
+void caminhoMinDijkstra(Graph* graph, ofstream& output_file){
+    int a, b;
+
+    cout << "Digite o ID dos vertices: " << endl;
+    cin >> a >> b;
+
+    float cam = graph->dijkstra(a, b);
+    if(cam == 100000){
+        cout << "Não existe caminho entre os dois vertices" << endl;
+    }else
+        cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
 }
 
 int menu(){
@@ -217,7 +237,10 @@ int menu(){
 void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
-
+        case 0:{
+            exit;
+            break;
+        }
         //Subgrafo induzido por um conjunto de vértices X;
         case 1:{
             subgrafoInduzido(graph, output_file);
@@ -225,7 +248,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
             //Caminho mínimo entre dois vértices usando Dijkstra;
         case 2:{
-
+            caminhoMinDijkstra(graph, output_file);
             break;
         }
 

@@ -8,6 +8,7 @@
 #include <fstream>
 #include <stack>
 #include <list>
+#include <vector>
 
 using namespace std;
 
@@ -65,6 +66,7 @@ class Graph{
         bool pesquisaNaLista(list<int>* lista, int id);
         void auxCaminhoProfund(int id, Graph* graph, list<int>* auxList, list<Edge>* arestas);
         bool buscaVetor(int* listIdNodes, int id, int ordem);
+        int retornaIndice(int j, vector<int>* vertice);   
         bool cicloGrafo(int id, list<int>* lista, list<int>* pilha);
 };
 

@@ -120,6 +120,7 @@ void Graph::insertNode(int id)
             this->first_node = node;
             this->last_node = node;
         }
+        cout << "Inserindo --------------> " << this->getNode(id)->getId() << endl;
     }
 }
 
@@ -402,47 +403,160 @@ float Graph::floydMarshall(int idSource, int idTarget){
         cout << "Erro: Nao existe vertice com Id inserido" << endl;
         exit(1);
     }
+    //Se o grafo nao tem peso nas arestas, entao a custo de caminho minimo de um vertice para outro e 0;
+    if( !this->getWeightedEdge() ){
+        return 0;
+    }
     //Funciona apenas se os vertices do grafo tiver ids ordenados de 1 a n.
     for(int i = 0; i < this->getOrder(); i++){
         node = this->getNode(i + 1);
-
+        cout << "ENTROU NO FOR PARA PREENCHER MATRIZ A0" << endl;
         for(int j = 0; j < this->getOrder(); j++){
             edge = node->hasEdgeBetween(j + 1);
-            if(i == j)
+            
+            if(i == j){
                 matriz[i][j] = 0;
-            else {
-                if(edge != nullptr){
-                    matriz[i][j] = edge->getWeight();
-                    //cout << "Peso da aresta " << edge->getWeight() << endl;
-                }
-                else
+                cout << "INSERINDO 0 NA POSICAO " << i << " " << j << endl;
+            }
+                
+            else { 
+                //cout << "ARESTA ---> " << edge->getTargetId() << " PESO: " << edge->getWeight() << endl; 
+                //Para vertices que sao vizinhos.
+                if(edge == nullptr){
                     matriz[i][j] = 10000;
+                    //cout << "INSERINDO 10000 NA POSICAO " << i << " " << j << endl;
+                }
+                //Para evitar que grafos que nao tem peso nas arestas tenham valor infinito.
+                else if( edge->getWeight() == 0) 
+                    matriz[i][j] = 0;
+                //Para vertices que nao sao vizinhos.
+                else{ 
+                    matriz[i][j] = edge->getWeight();
+                    cout << "INSERINDO " << edge->getWeight() << " NA POSICAO " << i << " " << j << endl;
+                }
             }
         }
     }
     for(int k = 1; k < this->getOrder(); k++){
         for(int i = 0; i < this->getOrder(); i++){
             for(int j = 0; j < this->getOrder(); j++){
+                cout << "ATUALIZANDO VALORES DA MATRIZ" << endl; 
                 if(matriz[i][k] + matriz[k][j] < matriz[i][j]){
                     matriz[i][j] = matriz[i][k] + matriz[k][j];
                 }
             }
         }
     }
+    cout << "IMPRIMINDO MATRIZ" << endl;
     for(int i = 0; i < this->getOrder(); i++){
         for(int j = 0; j < this->getOrder(); j++)
             cout << matriz[i][j] << " \t";
         cout << endl;
     }
 
-    return matriz[idSource][idTarget];
+    return matriz[idSource - 1][idTarget - 1];
+}
+
+float Graph::dijkstra(int idSource, int idTarget){
+    if( !this->searchNode(idSource) || !this->searchNode(idTarget) ){
+        cout << "Nao existe vertice no grafo com o ID inserido" << endl;
+        exit;
+    }
+    float inf = numeric_limits<float>::max();
+    //Armazena vertices a serem visitados.
+    vector<int>* vertice = new vector<int>;
+    //Armazena vertices já visitados.
+    list<int>* vVisitado = new list<int>;
+    float caminho;
+
+    //Vetor para armazenar peso das arestas.
+    float pi[ this->getOrder() ];
+
+    //Insere no inicial a lista de vertices ja visitados.
+    vVisitado->push_back(idSource);
+
+    //Ponteiro aponto para vertice inicial.
+    Node* node = this->getNode(idSource);
+
+    for(Node* aux = this->getFirstNode(); aux != nullptr; aux = aux->getNextNode()){
+        //Preenche a lista de vertices a serem visitados.
+        //if(aux->getId() != idSource){
+            vertice->push_back( aux->getId() );
+        //}
+    }
+    //Pegar todos os vertices do grafo e verificar se são vizinhos do vertice idSouce.
+    Node* aux = this->getFirstNode();
+
+    for(int i = 0; i < this->getOrder(); i++){
+        //Para evitar que valor do vertice inicial seja alterado.
+        if(aux->getId() != idSource){ 
+            Edge* edge = node->hasEdgeBetween( aux->getId() );
+            //cout << "VIZINHOS DE J" << edge->getTargetId() << endl;
+            
+            if( edge != nullptr)
+                pi[i] = edge->getWeight();
+            else 
+                pi[i] = 100000;    
+        } else {
+            pi[i] = 0;
+        }   
+        aux = aux->getNextNode();
+    }    
+
+    //Construindo o caminho ate o id target ser visitado.
+    while ( !pesquisaNaLista(vVisitado, idTarget) )
+    {
+        int j = -1, menor = 1000000;
+        aux = this->getFirstNode();
+        //Procurar menor elemento dentro do vetor.
+        while (aux != nullptr) {
+            
+            //Atualizando valores de pi.
+            if( !pesquisaNaLista(vVisitado, aux->getId()) ){ 
+                if (pi[ retornaIndice(aux->getId(), vertice) ] < menor) {
+                    menor = pi[ retornaIndice(aux->getId(), vertice) ];
+                    //j recebe id do menor vertice.
+                    j = aux->getId(); 
+                }
+            }
+            aux = aux->getNextNode();
+        }
+
+        //Removendo o vertice da lista inicial de vertices.
+        //vertice->erase( remove(vertice->begin(), vertice->end(), int(j)) );
+        vVisitado->push_back(j);
+        caminho = pi[ retornaIndice(j, vertice) ];
+
+        //Percorrendo pelos vizinhos do vertice j para atualiza-los.
+        for(Edge* edge = this->getNode(j)->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+        {
+            int i = edge->getTargetId();
+            //Pegando vizinhos de j que já foram visitados.
+            float aux = pi[ retornaIndice(j, vertice) ] + edge->getWeight();
+            if(aux < pi[ retornaIndice(i, vertice) ]){
+                //vertice->push_back( i );
+                pi[ retornaIndice(i, vertice) ] = aux;
+            }
+        }
+    }
+
+    //delete vertice;
+    //delete vVisitado;
+    return caminho;
+}
+
+int Graph::retornaIndice (int j, vector<int>* vertice){
+    vector<int>::iterator it;
+    int cont = 0;
+    for (it = vertice->begin(); it != vertice->end(); it++) {
+        if(*it != j) 
+            cont++;
+        else return cont;
+    }
+    return 0;
 }
 
 /*
-float Graph::dijkstra(int idSource, int idTarget){
-
-}
-
 void breadthFirstSearch(ofstream& output_file){
 
 }

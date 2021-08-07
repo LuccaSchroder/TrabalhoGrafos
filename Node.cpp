@@ -110,8 +110,8 @@ void Node::insertEdge(int target_id, float weight){
             this->first_edge->setWeight(weight);
             this->last_edge = this->first_edge;
         }
-    } else 
-        cout << "-------Aresta " << this->getId() << " " << target_id << " ja existe no grafo-------" << endl;
+    } //else 
+       //cout << "-------Aresta " << this->getId() << " " << target_id << " ja existe no grafo-------" << endl;
 
 }
 
