@@ -100,6 +100,11 @@ Node *Graph::getNode(int id)
     return nullptr;
 }
 
+void Graph::incrementNumberEdges(){
+    
+    this->number_edges++; 
+}
+
 // Other methods
 /*
     The outdegree attribute of nodes is used as a counter for the number of edges in the graph.
@@ -131,17 +136,21 @@ void Graph::insertEdge(int id, int target_id, float weight)
     this->insertNode(target_id);
 
     Node* node = this->getNode(id);
-    node->insertEdge(target_id, weight);
-    node->incrementOutDegree();
-        
-    // Caso o grafo não seja direcionado.
-    if( !this->getDirected() ){
-        node = this->getNode(target_id);
-        node->insertEdge(id, weight);
+    if( node->insertEdge(target_id, weight) ){
         node->incrementOutDegree();
-    } else 
-        node->incrementInDegree();
-    
+        
+        // Caso o grafo não seja direcionado.
+        node = this->getNode(target_id);
+        if( !this->getDirected() ){
+            node->insertEdge(id, weight);
+            node->incrementOutDegree();
+        } else 
+            node->incrementInDegree();
+        
+        //Atualiza o numero de arestas no grafo.
+        this->incrementNumberEdges();
+    }
+  
 }
 
 void Graph::removeNode(int id){
@@ -165,8 +174,9 @@ void Graph::imprimeLista (list<int>* lista){
     list<int>::iterator it;
 
     for (it = lista->begin(); it != lista->end(); it++) {
-        cout << *it << endl;
+        cout << *it << " ";
     }
+    cout << endl;
 }
 
 bool Graph::pesquisaNaLista(list<int>* lista, int id){
@@ -203,6 +213,11 @@ void Graph::fechoDireto(int id){
     list<int> *lista;
     lista = new list<int>;
 
+    if(node == nullptr){
+        cout << "Erro: Id inserido nao corresponde a nenhum vertice do grafo." << endl;
+        exit(3);
+    }
+
     //Garante que o grafo é direcionado e que o vertice tenha pelo menos um vizinho.
     if(this->getDirected()) {
         
@@ -210,7 +225,7 @@ void Graph::fechoDireto(int id){
             auxFechoDireto(lista, id, node);
             this->imprimeLista(lista);
         } else 
-            cout << "Vertice nao alcança nenhum outro" << endl;
+            cout << "Vertice nao e alcançado por nenhum outro." << endl;
         
     } else
         cout << "Grafo nao direcionado" << endl;
@@ -247,7 +262,7 @@ Graph* Graph::getVertexInduced(int* listIdNodes, int ordem){
         for(Edge* edge = original->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
             if( buscaVetor(listIdNodes, edge->getTargetId(), ordem) ){
 
-                node->insertEdge( edge->getTargetId(), node->getWeight());
+                node->insertEdge( edge->getTargetId(), edge->getWeight() );
                 listIdNodes[i] = -1;
             }
         }
@@ -296,7 +311,7 @@ Graph* Graph::caminhoProfund(int id){
     cout << "---------- Arestas de Retorno ----------" << endl;
     for (it = arestasRet->begin(); it != arestasRet->end(); it++)
     {
-        cout << it->getIdNode() << " " << it->getTargetId() <<endl;
+        cout << it->getIdNode() << " --- " << it->getTargetId() <<endl;
     }
     cout << "----------------------------------------" << endl;
 
@@ -563,8 +578,114 @@ void breadthFirstSearch(ofstream& output_file){
 
 Graph* agmKuskal(){
 
-}
-Graph* agmPrim(){
+}*/
 
-}
-*/
+Graph* Graph::agmPrim(){
+
+    Graph* agm = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+    
+    if (this->getNumberEdges() < 1){
+        cout << "Grafo nao possui nenhuma arestas." << endl;
+        agm = nullptr;
+        return agm;
+    }
+    
+    int* prox = new int[ this->getOrder() ]; 
+
+    //Vetor auxiliar para armazenar o indice dos vertice.
+    vector<int>* vertice = new vector<int>;
+
+    //Guarda aresta de menor peso para comparar.
+    int vSource, vTarget;
+    float menorPeso = 100000;
+
+    //Procura aresta com menor peso.
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        vertice->push_back( node->getId() );
+
+        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            if(edge->getWeight() < menorPeso){
+                menorPeso = edge->getWeight();
+                vSource = node->getId();
+                vTarget = edge->getTargetId();
+            }   
+        }
+    }
+
+    //Insere 1 aresta no grafo de retorno agm.
+    agm->insertEdge(vSource, vTarget, menorPeso);
+
+    //Preenchendo vetor prox.    
+    for(int i = 0; i < this->getOrder(); i++){
+        Node* node = this->getNode( vertice->at(i) );
+        //Pegando aresta (i, vSource) e (i, vTarget).
+        Edge* edge1 = node->hasEdgeBetween( vSource );
+        Edge* edge2 = node->hasEdgeBetween( vTarget ); 
+        
+        if(edge1 != nullptr && edge2 != nullptr){
+            if( edge1->getWeight() < edge2->getWeight() )
+                prox[i] = vSource;
+            else
+                prox[i] = vTarget;
+
+        } else if ( edge1 != nullptr && edge2 == nullptr )
+            prox[i] = vSource;
+        
+        else if ( edge1 == nullptr && edge2 != nullptr )
+            prox[i] = vTarget;
+        
+        else
+            prox[i] = 100000;
+    }
+
+    //Inserir 0 para as arestas vSource e vTarget.
+    prox [ retornaIndice (vSource, vertice) ] = 0;
+    prox [ retornaIndice (vTarget, vertice) ] = 0;
+    
+    int cont = 0;
+
+    while(cont < this->getOrder() - 2){
+        
+        //Escolhendo a proxima aresta de menor peso.
+        int menor = 100000;
+        vSource = -1, vTarget = -1;
+        for(int i = 0; i < this->getOrder(); i ++){
+            if(prox[i] != 0){
+                //Acessando a aresta.
+                Node* node = this->getNode( vertice->at(i) );
+                Edge* edge = node->hasEdgeBetween( prox[i] );
+                //selecionando aresta de menor custo.
+                if(edge != nullptr){
+                    if(edge->getWeight() < menor){
+                        menor = edge->getWeight();
+                        vSource = vertice->at(i);
+                        vTarget = prox[i];
+                    }
+                }
+            }
+        }
+        //Insere aresta no grafo.
+        agm->insertEdge(vSource, vTarget, menor);
+        prox [ retornaIndice (vSource, vertice) ] = 0;
+
+        //Atualiza o vetor prox.
+        for(int i = 0; i < this->getOrder(); i ++){
+            if(prox[i] != 0){
+
+                Node* node = this->getNode( vertice->at(i) );
+                
+                Edge* edge1 = node->hasEdgeBetween( prox[i] );
+                Edge* edge2 = node->hasEdgeBetween( vSource );
+                
+                if(edge1 != nullptr && edge2 != nullptr){
+                    if( edge1->getWeight() > edge2->getWeight() )
+                        prox[i] = vSource;
+
+                } else if ( edge1 == nullptr && edge2 != nullptr )
+                    prox[i] = vSource;
+            }
+        }
+        cont++;
+    }
+    return agm;
+}   
