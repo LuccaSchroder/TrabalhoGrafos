@@ -43,6 +43,7 @@ class Graph{
         void removeNode(int id);
         bool searchNode(int id);
         Node* getNode(int id);
+        void incrementNumberEdges();
 
         //methods phase1
         void fechoDireto(int id);

@@ -138,6 +138,10 @@ void Graph::insertEdge(int id, int target_id, float weight)
     Node* node = this->getNode(id);
     if( node->insertEdge(target_id, weight) ){
         node->incrementOutDegree();
+
+        //Atualiza o numero de arestas no grafo.
+        this->incrementNumberEdges();
+        cout << "IMPRIMINDO N DE ARESTAS " << this->getNumberEdges() << endl; 
         
         // Caso o grafo não seja direcionado.
         node = this->getNode(target_id);
@@ -146,9 +150,6 @@ void Graph::insertEdge(int id, int target_id, float weight)
             node->incrementOutDegree();
         } else 
             node->incrementInDegree();
-        
-        //Atualiza o numero de arestas no grafo.
-        this->incrementNumberEdges();
     }
   
 }
@@ -262,7 +263,7 @@ Graph* Graph::getVertexInduced(int* listIdNodes, int ordem){
         for(Edge* edge = original->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
             if( buscaVetor(listIdNodes, edge->getTargetId(), ordem) ){
 
-                node->insertEdge( edge->getTargetId(), edge->getWeight() );
+                vInduzido->insertEdge(node->getId(), edge->getTargetId(), edge->getWeight() );
                 listIdNodes[i] = -1;
             }
         }

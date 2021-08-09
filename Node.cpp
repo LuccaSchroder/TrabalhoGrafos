@@ -94,7 +94,7 @@ void Node::setWeight(float weight){
 }
 
 // Other methods
-void Node::insertEdge(int target_id, float weight){
+bool Node::insertEdge(int target_id, float weight){
     // Verifies whether there are at least one edge in the node (Verifica se existe pelo menos uma aresta no n�)
     if( !this->searchEdge(target_id) ){
         if(this->first_edge != nullptr){
@@ -110,7 +110,10 @@ void Node::insertEdge(int target_id, float weight){
             this->first_edge->setWeight(weight);
             this->last_edge = this->first_edge;
         }
-    } //else 
+        cout << "Inseriu Aresta ---------------->>>>" << endl;
+        return true;
+    } else 
+        return false;
        //cout << "-------Aresta " << this->getId() << " " << target_id << " ja existe no grafo-------" << endl;
 
 }

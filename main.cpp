@@ -121,6 +121,18 @@ void escreveArquivo(Graph* graph, ofstream& output_file){
     output_file << "}" << endl;
 }
 
+//Função para imprimir grafo.
+void imprimeGrafo(Graph* graph){
+
+    cout << "Ordem: " << graph->getOrder() << endl;
+    cout << "Arestas " << endl;
+    for (Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            cout << node->getId() << " " << edge->getTargetId() << endl; 
+        }
+    }
+}
+
 //Funcao auxiliar fecho transitivo direto.
 void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     int vertice;
@@ -148,15 +160,8 @@ void subgrafoInduzido(Graph* graph, ofstream& output_file){
     }
 
     vInduzido = graph->getVertexInduced(listIdNodes, quantVertices);
-
-    cout << "Ordem: " << vInduzido->getOrder() << endl;
-    cout << "Arestas: " << endl;
-    for (Node* node = vInduzido->getFirstNode(); node != nullptr; node = node->getNextNode()){
-        for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
-            cout << node->getId() << " " << edge->getTargetId() << endl; 
-        }
-    }
-
+    imprimeGrafo(vInduzido);
+    
     delete [] listIdNodes;
 }
 
@@ -205,6 +210,27 @@ void caminhoMinDijkstra(Graph* graph, ofstream& output_file){
         cout << "Não existe caminho entre os dois vertices" << endl;
     }else
         cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
+}
+
+//Função auxiliar algoritmo de Prim.
+void auxAgmPrim(Graph* graph, ofstream& output_file){
+    Graph* prim;
+    /*int quantVertices;
+    
+    cout << "Quantos vertice?" << endl;
+    cin >> quantVertices;
+    
+    int* listIdNodes = new int [quantVertices];
+
+    cout << "Digite o ID dos vertices" << endl;
+    for(int i = 0; i < quantVertices; i++){
+        cin >> listIdNodes[i];
+    }
+
+    prim = graph->getVertexInduced(listIdNodes, quantVertices);
+    prim = prim->agmPrim();*/
+    prim = graph->agmPrim();
+    imprimeGrafo(prim);
 }
 
 int menu(){
@@ -258,15 +284,12 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             break;
         }
 
-            //AGM - Kruscal;
+            //AGM Prim;
         case 4:{
-
-
-
+            auxAgmPrim(graph, output_file);
             break;
         }
-
-            //AGM Prim;
+            //AGM - Kruscal;
         case 5:{
 
             break;
