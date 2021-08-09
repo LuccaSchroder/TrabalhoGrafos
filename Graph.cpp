@@ -192,21 +192,21 @@ bool Graph::pesquisaNaLista(list<int>* lista, int id){
 }
 
 void Graph::auxFechoDireto(list<int>* lista, int id, Node* node) { 
-    
+    cout << "AUX FECHO DIRETO" << endl;
     for (Edge* vizinho = node->getFirstEdge(); vizinho != nullptr; vizinho = vizinho->getNextEdge()) {
             //Verificar se elemento existe na lista,  caso exista não inserir.
-
-            //Adiciona vertice na lista.
-            if( !this->pesquisaNaLista( lista, vizinho->getTargetId() ))
+            cout << "ENTRANDO NO FOR" << endl;
+            //Visitar apenas vertices que ainda nao foram vizitados.
+            if( !this->pesquisaNaLista( lista, vizinho->getTargetId() ) && vizinho->getTargetId() != id){
                 lista->push_back( vizinho->getTargetId() );
+                imprimeLista(lista);
+                //Seleciona vertice vizinho.
+                Node* aux = getNode( vizinho->getTargetId() );
 
-            //Seleciona vertice vizinho.
-            Node* aux = getNode( vizinho->getTargetId() );
-
-            //Funacao recursiva.
-            auxFechoDireto(lista, aux->getId(), aux);       
+                //Funacao recursiva.
+                auxFechoDireto(lista, id, aux);
+            }
     }
-
 }
 
 void Graph::fechoDireto(int id){
@@ -221,12 +221,13 @@ void Graph::fechoDireto(int id){
 
     //Garante que o grafo é direcionado e que o vertice tenha pelo menos um vizinho.
     if(this->getDirected()) {
-        
+        cout << "Grafo DIrecionado" << endl;
         if(node->getOutDegree() > 0 ){
+            cout << "Chamando função auxiliar" << endl;
             auxFechoDireto(lista, id, node);
             this->imprimeLista(lista);
         } else 
-            cout << "Vertice nao e alcançado por nenhum outro." << endl;
+            cout << "Vertice nao alcança nenhum outro." << endl;
         
     } else
         cout << "Grafo nao direcionado" << endl;
