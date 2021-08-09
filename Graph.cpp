@@ -141,7 +141,6 @@ void Graph::insertEdge(int id, int target_id, float weight)
 
         //Atualiza o numero de arestas no grafo.
         this->incrementNumberEdges();
-        cout << "IMPRIMINDO N DE ARESTAS " << this->getNumberEdges() << endl; 
         
         // Caso o grafo não seja direcionado.
         node = this->getNode(target_id);
@@ -192,20 +191,18 @@ bool Graph::pesquisaNaLista(list<int>* lista, int id){
 }
 
 void Graph::auxFechoDireto(list<int>* lista, int id, Node* node) { 
-    cout << "AUX FECHO DIRETO" << endl;
-    for (Edge* vizinho = node->getFirstEdge(); vizinho != nullptr; vizinho = vizinho->getNextEdge()) {
-            //Verificar se elemento existe na lista,  caso exista não inserir.
-            cout << "ENTRANDO NO FOR" << endl;
-            //Visitar apenas vertices que ainda nao foram vizitados.
-            if( !this->pesquisaNaLista( lista, vizinho->getTargetId() ) && vizinho->getTargetId() != id){
-                lista->push_back( vizinho->getTargetId() );
-                imprimeLista(lista);
-                //Seleciona vertice vizinho.
-                Node* aux = getNode( vizinho->getTargetId() );
 
-                //Funacao recursiva.
-                auxFechoDireto(lista, id, aux);
-            }
+    for (Edge* vizinho = node->getFirstEdge(); vizinho != nullptr; vizinho = vizinho->getNextEdge()) {
+        //Visitar apenas vertices que ainda nao foram vizitados.
+        if( !this->pesquisaNaLista( lista, vizinho->getTargetId() ) && vizinho->getTargetId() != id){
+            lista->push_back( vizinho->getTargetId() );
+
+            //Seleciona vertice vizinho.
+            Node* aux = getNode( vizinho->getTargetId() );
+
+            //Funacao recursiva.
+            auxFechoDireto(lista, id, aux);
+        }
     }
 }
 
@@ -221,18 +218,75 @@ void Graph::fechoDireto(int id){
 
     //Garante que o grafo é direcionado e que o vertice tenha pelo menos um vizinho.
     if(this->getDirected()) {
-        cout << "Grafo DIrecionado" << endl;
         if(node->getOutDegree() > 0 ){
-            cout << "Chamando função auxiliar" << endl;
             auxFechoDireto(lista, id, node);
             this->imprimeLista(lista);
         } else 
-            cout << "Vertice nao alcança nenhum outro." << endl;
+            cout << "Vertice nao alcança nenhum outro." << endl;  
+    } else
+        cout << "Grafo nao direcionado" << endl;  
+}
+
+
+void Graph::auxFechoIndireto(list<int>* lista, list<int>* pilha, list<int>* visitado, Node* node, int id) { 
+
+    if(node->getId() != id){
+        //Se existir ciclo no grafo evita inserir um mesmo vertice varias vezes.
+        if( !pesquisaNaLista(pilha, node->getId()) ){
+            pilha->push_front( node->getId() );
+
+            for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()) {
+                
+                if( !pesquisaNaLista(lista, edge->getTargetId()) ){
+                    if(edge->getTargetId() == id){
+                        lista->push_back( node->getId() );
+                        
+                    } else {   
+                        Node* aux = this->getNode( edge->getTargetId() );                     
+                        auxFechoIndireto(lista, pilha, visitado, aux, id);
+
+                        if( pesquisaNaLista(lista, edge->getTargetId()) ){
+                            if( !pesquisaNaLista(lista, node->getId()) )
+                                lista->push_back( node->getId() );
+                        }
+                    }
+                }
+            }
+            pilha->pop_front();
+            visitado->push_back( node->getId() );
+        }
+    } else {
+        auxFechoIndireto(lista, pilha, visitado, node->getNextNode(), id);
+    } 
+}
+
+void Graph::fechoIndireto(int id){
+    Node* node = this->getNode(id);
+    list<int>* lista = new list<int>;
+    list<int>* pilha = new list<int>;
+    list<int>* visitado = new list<int>;
+
+    if(this->getDirected()) {
         
+        if(node->getInDegree() > 0 ){
+            auxFechoIndireto(lista, pilha, visitado,this->getFirstNode(), id);
+
+            for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+                cout << "COMPONENTE CONEXA" << endl;
+                if( !pesquisaNaLista(visitado, node->getId()) ){
+                    imprimeLista(visitado);
+                    cout << " NOS SEPARADOS " << node->getId() << endl;
+                    auxFechoIndireto(lista, pilha, visitado, node, id);
+                }
+            }
+            cout << "------------ IMPRIMINDO FECHO DE VERTICES ---------------" << endl;
+            this->imprimeLista(lista);
+        } else 
+            cout << "Vertice nao e alcançado por nenhum outro." << endl;
     } else
         cout << "Grafo nao direcionado" << endl;
-    
 }
+
 
 
 //Function that prints a set of edges belongs breadth tree

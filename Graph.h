@@ -47,6 +47,7 @@ class Graph{
 
         //methods phase1
         void fechoDireto(int id);
+        void fechoIndireto(int id);
         Graph* caminhoProfund(int id);
         list<int>* topologicalSorting();
         //void breadthFirstSearch(ofstream& output_file);
@@ -63,6 +64,7 @@ class Graph{
     private:
         //Auxiliar methods
         void auxFechoDireto(list<int>* lista, int id, Node* node);
+        void auxFechoIndireto(list<int>* lista, list<int>* pilha, list<int>* visitado, Node* node, int id);
         void imprimeLista (list<int>* lista);
         bool pesquisaNaLista(list<int>* lista, int id);
         void auxCaminhoProfund(int id, Graph* graph, list<int>* auxList, list<Edge>* arestas);

@@ -144,6 +144,17 @@ void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     
 }
 
+//Funcao auxiliar fecho transitivo indireto.
+void verticeTransitivoIndireto(Graph* graph, ofstream& output_file) {
+    int vertice;
+
+    cout << "Digite o ID do vertice: " << endl;
+    cin >> vertice; 
+
+    graph->fechoIndireto(vertice);
+    
+}
+
 //Funcao auxiliar grafo vertice induzido.
 void subgrafoInduzido(Graph* graph, ofstream& output_file){
     int quantVertices;
@@ -247,10 +258,11 @@ int menu(){
     cout << "[6] Imprimir caminhamento em largura" << endl;
     cout << "[7] Imprimir ordenacao topológica" << endl;
     cout << "[8] Imprimir Fecho Transitivo Direto de um vertice" << endl;
-    cout << "[9] Caminhamento em Profundidade" << endl;
-    cout << "[10] Algoritmo Guloso" << endl;
-    cout << "[11] Algoritmo Guloso Randomizado " << endl;
-    cout << "[12] Algoritmo Guloso Randomizado Reativo" << endl;
+    cout << "[9] Imprimir Fecho Transitivo Indireto de um vertice" << endl;
+    cout << "[10] Caminhamento em Profundidade" << endl;
+    cout << "[11] Algoritmo Guloso" << endl;
+    cout << "[12] Algoritmo Guloso Randomizado " << endl;
+    cout << "[13] Algoritmo Guloso Randomizado Reativo" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -267,7 +279,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             exit;
             break;
         }
-        //Subgrafo induzido por um conjunto de vértices X;
+            //Subgrafo induzido por um conjunto de vértices X;
         case 1:{
             subgrafoInduzido(graph, output_file);
             break;
@@ -277,13 +289,11 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             caminhoMinDijkstra(graph, output_file);
             break;
         }
-
             //Caminho mínimo entre dois vértices usando Floyd;
         case 3:{
             caminhoMinFloyd(graph, output_file);
             break;
         }
-
             //AGM Prim;
         case 4:{
             auxAgmPrim(graph, output_file);
@@ -310,7 +320,13 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             verticeTransitivoDireto(graph, output_file);
             break;
         }
+            //Fecho transitivo Indireto do vertice;
         case 9:{
+            verticeTransitivoIndireto(graph, output_file);
+            break;
+        }
+            //Caminhamento em profundidade;
+        case 10:{
             caminhoProfund(graph, output_file);
             break;
         }
