@@ -71,6 +71,7 @@ class Graph{
         bool buscaVetor(int* listIdNodes, int id, int ordem);
         int retornaIndice(int j, vector<int>* vertice);   
         bool cicloGrafo(int id, list<int>* lista, list<int>* pilha);
+        void ordenaVetor(vector<int>* vertice, vector<int>* aresta);
 };
 
 #endif // GRAPH_H_INCLUDED

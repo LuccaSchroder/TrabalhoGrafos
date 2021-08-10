@@ -125,7 +125,7 @@ void Graph::insertNode(int id)
             this->first_node = node;
             this->last_node = node;
         }
-        cout << "Inserindo --------------> " << this->getNode(id)->getId() << endl;
+        //cout << "Inserindo --------------> " << this->getNode(id)->getId() << endl;
     }
 }
 
@@ -253,7 +253,8 @@ void Graph::auxFechoIndireto(list<int>* lista, list<int>* pilha, list<int>* visi
                 }
             }
             pilha->pop_front();
-            visitado->push_back( node->getId() );
+            if( !pesquisaNaLista(visitado, node->getId()) )
+                visitado->push_back( node->getId() );
         }
     } else {
         auxFechoIndireto(lista, pilha, visitado, node->getNextNode(), id);
@@ -272,10 +273,10 @@ void Graph::fechoIndireto(int id){
             auxFechoIndireto(lista, pilha, visitado,this->getFirstNode(), id);
 
             for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
-                cout << "COMPONENTE CONEXA" << endl;
+                //cout << "COMPONENTE CONEXA" << endl;
                 if( !pesquisaNaLista(visitado, node->getId()) ){
-                    imprimeLista(visitado);
-                    cout << " NOS SEPARADOS " << node->getId() << endl;
+                    //imprimeLista(visitado);
+                    //cout << " NOS SEPARADOS " << node->getId() << endl;
                     auxFechoIndireto(lista, pilha, visitado, node, id);
                 }
             }
@@ -286,8 +287,6 @@ void Graph::fechoIndireto(int id){
     } else
         cout << "Grafo nao direcionado" << endl;
 }
-
-
 
 //Function that prints a set of edges belongs breadth tree
 
@@ -467,6 +466,8 @@ list<int>* Graph::topologicalSorting(){
 float Graph::floydMarshall(int idSource, int idTarget){
     float inf = numeric_limits<float>::max();
     float matriz[this->getOrder()][this->getOrder()];
+    vector<int>* vertice = new vector<int>;
+
     Node *node;
     Edge *edge;
     //Verifica se os dois vertices existe no grafo.
@@ -478,16 +479,21 @@ float Graph::floydMarshall(int idSource, int idTarget){
     if( !this->getWeightedEdge() ){
         return 0;
     }
+    //Preencher um vector com todos os vertices para consultar posição.
+    for(Node* aux = this->getFirstNode(); aux != nullptr; aux = aux->getNextNode()){
+        vertice->push_back( aux->getId() );
+    }
+
     //Funciona apenas se os vertices do grafo tiver ids ordenados de 1 a n.
     for(int i = 0; i < this->getOrder(); i++){
-        node = this->getNode(i + 1);
-        cout << "ENTROU NO FOR PARA PREENCHER MATRIZ A0" << endl;
+        node = this->getNode( vertice->at(i) );
+        //cout << "ENTROU NO FOR PARA PREENCHER MATRIZ A0" << endl;
         for(int j = 0; j < this->getOrder(); j++){
-            edge = node->hasEdgeBetween(j + 1);
+            edge = node->hasEdgeBetween( vertice->at(j) );
             
             if(i == j){
                 matriz[i][j] = 0;
-                cout << "INSERINDO 0 NA POSICAO " << i << " " << j << endl;
+                //cout << "INSERINDO 0 NA POSICAO " << i << " " << j << endl;
             }
                 
             else { 
@@ -503,7 +509,7 @@ float Graph::floydMarshall(int idSource, int idTarget){
                 //Para vertices que nao sao vizinhos.
                 else{ 
                     matriz[i][j] = edge->getWeight();
-                    cout << "INSERINDO " << edge->getWeight() << " NA POSICAO " << i << " " << j << endl;
+                    //cout << "INSERINDO " << edge->getWeight() << " NA POSICAO " << i << " " << j << endl;
                 }
             }
         }
@@ -511,21 +517,21 @@ float Graph::floydMarshall(int idSource, int idTarget){
     for(int k = 1; k < this->getOrder(); k++){
         for(int i = 0; i < this->getOrder(); i++){
             for(int j = 0; j < this->getOrder(); j++){
-                cout << "ATUALIZANDO VALORES DA MATRIZ" << endl; 
+                //cout << "ATUALIZANDO VALORES DA MATRIZ" << endl; 
                 if(matriz[i][k] + matriz[k][j] < matriz[i][j]){
                     matriz[i][j] = matriz[i][k] + matriz[k][j];
                 }
             }
         }
     }
-    cout << "IMPRIMINDO MATRIZ" << endl;
+    //cout << "IMPRIMINDO MATRIZ" << endl;
     for(int i = 0; i < this->getOrder(); i++){
         for(int j = 0; j < this->getOrder(); j++)
             cout << matriz[i][j] << " \t";
         cout << endl;
     }
 
-    return matriz[idSource - 1][idTarget - 1];
+    return matriz[ retornaIndice(idSource, vertice) ][ retornaIndice(idTarget, vertice) ];
 }
 
 float Graph::dijkstra(int idSource, int idTarget){
@@ -629,10 +635,6 @@ int Graph::retornaIndice (int j, vector<int>* vertice){
 
 /*
 void breadthFirstSearch(ofstream& output_file){
-
-}
-
-Graph* agmKuskal(){
 
 }*/
 
@@ -745,3 +747,23 @@ Graph* Graph::agmPrim(){
     }
     return agm;
 }   
+
+
+/*Graph* Graph::agmKuskal(){
+    //vector<int>* vertice = new vector<int>;
+    //vector<int>* aresta = new vector<int>;
+
+    list<Node>* vertice = new list<Node>;
+
+    //Percorrer grafo e armazenar arestas por ordem crescente de pesos.
+    Edge* menorPeso;
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        menorPeso = nullptr;
+        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            if(edge->getWeight() < menorPeso->getWeight()){
+                //menorPeso = edge->getWeight();
+            }   
+        }
+
+    }
+}*/

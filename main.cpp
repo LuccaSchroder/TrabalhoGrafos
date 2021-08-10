@@ -244,6 +244,13 @@ void auxAgmPrim(Graph* graph, ofstream& output_file){
     imprimeGrafo(prim);
 }
 
+void auxAgmKruscal(Graph* graph, ofstream& output_file){
+    Graph* kruscal;
+
+    //kruscal = graph->agmKuskal();
+    imprimeGrafo( kruscal );
+}
+
 int menu(){
 
     int selecao;
@@ -301,7 +308,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
             //AGM - Kruscal;
         case 5:{
-
+            auxAgmKruscal(graph, output_file);
             break;
         }
 

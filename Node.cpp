@@ -110,7 +110,7 @@ bool Node::insertEdge(int target_id, float weight){
             this->first_edge->setWeight(weight);
             this->last_edge = this->first_edge;
         }
-        cout << "Inseriu Aresta ---------------->>>>" << endl;
+        //cout << "Inseriu Aresta ---------------->>>>" << endl;
         return true;
     } else 
         return false;
