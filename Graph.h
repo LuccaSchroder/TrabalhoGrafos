@@ -8,6 +8,7 @@
 #include <fstream>
 #include <stack>
 #include <list>
+#include <vector>
 
 using namespace std;
 
@@ -42,12 +43,14 @@ class Graph{
         void removeNode(int id);
         bool searchNode(int id);
         Node* getNode(int id);
+        void incrementNumberEdges();
 
         //methods phase1
         void fechoDireto(int id);
+        void fechoIndireto(int id);
         Graph* caminhoProfund(int id);
-        void topologicalSorting();
-        void breadthFirstSearch(ofstream& output_file);
+        list<int>* topologicalSorting();
+        //void breadthFirstSearch(ofstream& output_file);
         Graph* getVertexInduced(int* listIdNodes, int ordem);
         Graph* agmKuskal();
         Graph* agmPrim();
@@ -61,10 +64,14 @@ class Graph{
     private:
         //Auxiliar methods
         void auxFechoDireto(list<int>* lista, int id, Node* node);
+        void auxFechoIndireto(list<int>* lista, list<int>* pilha, list<int>* visitado, Node* node, int id);
         void imprimeLista (list<int>* lista);
         bool pesquisaNaLista(list<int>* lista, int id);
         void auxCaminhoProfund(int id, Graph* graph, list<int>* auxList, list<Edge>* arestas);
         bool buscaVetor(int* listIdNodes, int id, int ordem);
+        int retornaIndice(int j, vector<int>* vertice);   
+        bool cicloGrafo(int id, list<int>* lista, list<int>* pilha);
+        void ordenaVetor(vector<int>* vertice, vector<int>* aresta);
 };
 
 #endif // GRAPH_H_INCLUDED

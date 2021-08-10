@@ -98,6 +98,41 @@ Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, in
     return graph;
 }
 
+//Função para escrever no arquivo.
+void escreveArquivo(Graph* graph, ofstream& output_file){
+    
+    if ( !graph->getDirected() ) 
+        output_file << "strict graph {" << endl;
+    else 
+        output_file << "digraph graphname {" << endl;
+
+    for(Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
+       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+       {
+           if(graph->getDirected()){
+                cout << node->getId() << "->" << edge->getTargetId() << ";" << endl;
+                output_file <<  node->getId() << "->" << edge->getTargetId() << endl;
+            } else {
+                cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
+                output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
+            }
+       }
+    }
+    output_file << "}" << endl;
+}
+
+//Função para imprimir grafo.
+void imprimeGrafo(Graph* graph){
+
+    cout << "Ordem: " << graph->getOrder() << endl;
+    cout << "Arestas " << endl;
+    for (Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            cout << node->getId() << " " << edge->getTargetId() << endl; 
+        }
+    }
+}
+
 //Funcao auxiliar fecho transitivo direto.
 void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     int vertice;
@@ -106,6 +141,17 @@ void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     cin >> vertice; 
 
     graph->fechoDireto(vertice);
+    
+}
+
+//Funcao auxiliar fecho transitivo indireto.
+void verticeTransitivoIndireto(Graph* graph, ofstream& output_file) {
+    int vertice;
+
+    cout << "Digite o ID do vertice: " << endl;
+    cin >> vertice; 
+
+    graph->fechoIndireto(vertice);
     
 }
 
@@ -125,15 +171,8 @@ void subgrafoInduzido(Graph* graph, ofstream& output_file){
     }
 
     vInduzido = graph->getVertexInduced(listIdNodes, quantVertices);
-
-    cout << "Ordem: " << vInduzido->getOrder() << endl;
-    cout << "Arestas: " << endl;
-    for (Node* node = vInduzido->getFirstNode(); node != nullptr; node = node->getNextNode()){
-        for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
-            cout << node->getId() << " " << edge->getTargetId() << endl; 
-        }
-    }
-
+    imprimeGrafo(vInduzido);
+    
     delete [] listIdNodes;
 }
 
@@ -147,17 +186,69 @@ void caminhoProfund(Graph* graph, ofstream& output_file){
 
     arvore = graph->caminhoProfund(vertice);
 
-    output_file << "strict graph {" << endl;
+    escreveArquivo(arvore, output_file);
+}
 
-    for(Node* node = arvore->getFirstNode(); node != nullptr; node = node->getNextNode()){
-       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
-       {
-            cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
-            output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
-       }
+void ordenacaoTopologica(Graph* graph, ofstream& output_file){
+    list<int>* ordem;
+    
+    ordem = graph->topologicalSorting();
+    
+    for (list<int>::iterator it = ordem->begin(); it != ordem->end(); it++) {
+        cout << *it << " ";
     }
-    output_file << "}" << endl;
+    cout << endl;
+}
 
+void caminhoMinFloyd(Graph* graph, ofstream& output_file){
+    int a, b;
+
+    cout << "Digite o ID dos vertices: " << endl;
+    cin >> a >> b;
+
+    float cam = graph->floydMarshall(a, b);
+    cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
+}
+
+void caminhoMinDijkstra(Graph* graph, ofstream& output_file){
+    int a, b;
+
+    cout << "Digite o ID dos vertices: " << endl;
+    cin >> a >> b;
+
+    float cam = graph->dijkstra(a, b);
+    if(cam == 100000){
+        cout << "Não existe caminho entre os dois vertices" << endl;
+    }else
+        cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
+}
+
+//Função auxiliar algoritmo de Prim.
+void auxAgmPrim(Graph* graph, ofstream& output_file){
+    Graph* prim;
+    /*int quantVertices;
+    
+    cout << "Quantos vertice?" << endl;
+    cin >> quantVertices;
+    
+    int* listIdNodes = new int [quantVertices];
+
+    cout << "Digite o ID dos vertices" << endl;
+    for(int i = 0; i < quantVertices; i++){
+        cin >> listIdNodes[i];
+    }
+
+    prim = graph->getVertexInduced(listIdNodes, quantVertices);
+    prim = prim->agmPrim();*/
+    prim = graph->agmPrim();
+    imprimeGrafo(prim);
+}
+
+void auxAgmKruscal(Graph* graph, ofstream& output_file){
+    Graph* kruscal;
+
+    //kruscal = graph->agmKuskal();
+    imprimeGrafo( kruscal );
 }
 
 int menu(){
@@ -174,10 +265,11 @@ int menu(){
     cout << "[6] Imprimir caminhamento em largura" << endl;
     cout << "[7] Imprimir ordenacao topológica" << endl;
     cout << "[8] Imprimir Fecho Transitivo Direto de um vertice" << endl;
-    cout << "[9] Caminhamento em Profundidade" << endl;
-    cout << "[10] Algoritmo Guloso" << endl;
-    cout << "[11] Algoritmo Guloso Randomizado " << endl;
-    cout << "[12] Algoritmo Guloso Randomizado Reativo" << endl;
+    cout << "[9] Imprimir Fecho Transitivo Indireto de um vertice" << endl;
+    cout << "[10] Caminhamento em Profundidade" << endl;
+    cout << "[11] Algoritmo Guloso" << endl;
+    cout << "[12] Algoritmo Guloso Randomizado " << endl;
+    cout << "[13] Algoritmo Guloso Randomizado Reativo" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -190,35 +282,33 @@ int menu(){
 void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
-
-        //Subgrafo induzido por um conjunto de vértices X;
+        case 0:{
+            exit;
+            break;
+        }
+            //Subgrafo induzido por um conjunto de vértices X;
         case 1:{
             subgrafoInduzido(graph, output_file);
             break;
         }
             //Caminho mínimo entre dois vértices usando Dijkstra;
         case 2:{
-
+            caminhoMinDijkstra(graph, output_file);
             break;
         }
-
             //Caminho mínimo entre dois vértices usando Floyd;
         case 3:{
-
+            caminhoMinFloyd(graph, output_file);
             break;
         }
-
-            //AGM - Kruscal;
-        case 4:{
-
-
-
-            break;
-        }
-
             //AGM Prim;
+        case 4:{
+            auxAgmPrim(graph, output_file);
+            break;
+        }
+            //AGM - Kruscal;
         case 5:{
-
+            auxAgmKruscal(graph, output_file);
             break;
         }
 
@@ -229,8 +319,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
             //Ordenação Topologica;
         case 7:{
-
-
+            ordenacaoTopologica(graph, output_file);
             break;
         }
             //Fecho transitivo direto do vertice;
@@ -238,7 +327,13 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             verticeTransitivoDireto(graph, output_file);
             break;
         }
+            //Fecho transitivo Indireto do vertice;
         case 9:{
+            verticeTransitivoIndireto(graph, output_file);
+            break;
+        }
+            //Caminhamento em profundidade;
+        case 10:{
             caminhoProfund(graph, output_file);
             break;
         }

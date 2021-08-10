@@ -1,0 +1,5 @@
+Criar exe
+g++ -o Grafo main.cpp Edge.cpp Edge.h Graph.cpp Graph.h Node.cpp Node.h
+
+Executar exe
+./TrabalhoGrafos.exe nomeArquivoEntrada.txt nomeArquivoSaida.dot direcionado(1/0) pesoAresta(1/0) 0
