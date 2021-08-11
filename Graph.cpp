@@ -141,6 +141,7 @@ void Graph::insertEdge(int id, int target_id, float weight)
 
         //Atualiza o numero de arestas no grafo.
         this->incrementNumberEdges();
+        //this->incrementNumberEdges();
         
         // Caso o grafo não seja direcionado.
         node = this->getNode(target_id);
@@ -206,7 +207,7 @@ void Graph::auxFechoDireto(list<int>* lista, int id, Node* node) {
     }
 }
 
-void Graph::fechoDireto(int id){
+list<int>* Graph::fechoDireto(int id){
     Node* node = this->getNode(id);
     list<int> *lista;
     lista = new list<int>;
@@ -217,14 +218,16 @@ void Graph::fechoDireto(int id){
     }
 
     //Garante que o grafo é direcionado e que o vertice tenha pelo menos um vizinho.
-    if(this->getDirected()) {
+    //if(this->getDirected()) {
         if(node->getOutDegree() > 0 ){
             auxFechoDireto(lista, id, node);
             this->imprimeLista(lista);
         } else 
-            cout << "Vertice nao alcança nenhum outro." << endl;  
-    } else
-        cout << "Grafo nao direcionado" << endl;  
+            cout << "Vertice nao alcança nenhum outro." << endl; 
+    //} else
+        //cout << "Grafo nao direcionado" << endl;  
+    
+     return lista;
 }
 
 
@@ -261,11 +264,16 @@ void Graph::auxFechoIndireto(list<int>* lista, list<int>* pilha, list<int>* visi
     } 
 }
 
-void Graph::fechoIndireto(int id){
+list<int>* Graph::fechoIndireto(int id){
     Node* node = this->getNode(id);
     list<int>* lista = new list<int>;
     list<int>* pilha = new list<int>;
     list<int>* visitado = new list<int>;
+
+    if(node == nullptr){
+        cout << "Erro: Id inserido nao corresponde a nenhum vertice do grafo." << endl;
+        exit(3);
+    }
 
     if(this->getDirected()) {
         
@@ -286,6 +294,8 @@ void Graph::fechoIndireto(int id){
             cout << "Vertice nao e alcançado por nenhum outro." << endl;
     } else
         cout << "Grafo nao direcionado" << endl;
+    
+    return lista;
 }
 
 //Function that prints a set of edges belongs breadth tree
@@ -404,6 +414,15 @@ bool Graph::cicloGrafo(int id, list<int>* lista, list<int>* pilha){
     return false; //foi adicionado porque aparece warning no terminal.
 } 
 
+int Graph::posicaoNode(int id){
+    int cont = 0;
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        if(node->getId() == id) return cont;
+        else cont++;
+    }
+    return 0;
+}
+
 //function that prints a topological sorting
 list<int>* Graph::topologicalSorting(){
     //lista de retorno.
@@ -416,6 +435,9 @@ list<int>* Graph::topologicalSorting(){
             //armazena sequencia de vertice para testar se forma um ciclo. (similar a uma pilha)
             list<int>* auxLista = new list<int>;
 
+            //cout << "IMPRIMINDO LISTA DE VERTICES" << endl;
+            //imprimeLista(lista);
+
             if( !cicloGrafo(this->getFirstNode()->getId(), lista, auxLista) ){
                 //Grafo nao tem nenhum ciclo (e uma DAG).
                 //Inicializa vetor que armazena grau de entrada dos vertices com 0.
@@ -423,10 +445,11 @@ list<int>* Graph::topologicalSorting(){
                 for(int i = 0; i < this->getOrder(); i++){
                     gEntrada[i] = 0;
                 }
+
                 //adiciona ao vetor grau de entrada de cada vertice.
                 for( Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode() ){
                     for( Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge() ){
-                        gEntrada[ edge->getTargetId() - 1]++;
+                        gEntrada[ posicaoNode(edge->getTargetId()) ]++;
                     }
                 }
 
@@ -434,7 +457,7 @@ list<int>* Graph::topologicalSorting(){
 
                 for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
                     //condicao funciona apenas se os indices dos vertices do grafo forem ordenados de 1 a n;
-                    if(gEntrada[ node->getId() - 1 ] == 0)
+                    if(gEntrada[ posicaoNode(node->getId()) ] == 0)
                         lista->push_back( node->getId() );
                 }
                 while ( lista->begin() != lista->end() ){
@@ -446,9 +469,9 @@ list<int>* Graph::topologicalSorting(){
                     lista->pop_front();
 
                     for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
-                        gEntrada[ edge->getTargetId() - 1 ]--;
+                        gEntrada[ posicaoNode(edge->getTargetId()) ]--;
 
-                        if( gEntrada[ edge->getTargetId() - 1] == 0 && !pesquisaNaLista(ordem, edge->getTargetId())) 
+                        if( gEntrada[ posicaoNode(edge->getTargetId()) ] == 0 && !pesquisaNaLista(ordem, edge->getTargetId())) 
                             lista->push_back( edge->getTargetId() );
                     }
                 } 
@@ -534,16 +557,22 @@ float Graph::floydMarshall(int idSource, int idTarget){
     return matriz[ retornaIndice(idSource, vertice) ][ retornaIndice(idTarget, vertice) ];
 }
 
-float Graph::dijkstra(int idSource, int idTarget){
+
+float Graph::dijkstra(int idSource, int idTarget, list<int>* vVisitado){
+
+    //Verifica se os ids passados por parâmetro corresponde a vertices do grafo.
     if( !this->searchNode(idSource) || !this->searchNode(idTarget) ){
         cout << "Nao existe vertice no grafo com o ID inserido" << endl;
         exit;
     }
+
     float inf = numeric_limits<float>::max();
+    
     //Armazena vertices a serem visitados.
     vector<int>* vertice = new vector<int>;
+    
     //Armazena vertices já visitados.
-    list<int>* vVisitado = new list<int>;
+    //list<int>* vVisitado = new list<int>;
     float caminho;
 
     //Vetor para armazenar peso das arestas.
@@ -552,7 +581,7 @@ float Graph::dijkstra(int idSource, int idTarget){
     //Insere no inicial a lista de vertices ja visitados.
     vVisitado->push_back(idSource);
 
-    //Ponteiro aponto para vertice inicial.
+    //Ponteiro para vertice inicial.
     Node* node = this->getNode(idSource);
 
     for(Node* aux = this->getFirstNode(); aux != nullptr; aux = aux->getNextNode()){
@@ -561,6 +590,7 @@ float Graph::dijkstra(int idSource, int idTarget){
             vertice->push_back( aux->getId() );
         //}
     }
+    
     //Pegar todos os vertices do grafo e verificar se são vizinhos do vertice idSouce.
     Node* aux = this->getFirstNode();
 
@@ -617,8 +647,6 @@ float Graph::dijkstra(int idSource, int idTarget){
         }
     }
 
-    //delete vertice;
-    //delete vVisitado;
     return caminho;
 }
 
@@ -723,7 +751,8 @@ Graph* Graph::agmPrim(){
             }
         }
         //Insere aresta no grafo.
-        agm->insertEdge(vSource, vTarget, menor);
+        if(vSource != -1 && vTarget != -1)
+            agm->insertEdge(vSource, vTarget, menor);
         prox [ retornaIndice (vSource, vertice) ] = 0;
 
         //Atualiza o vetor prox.
@@ -748,22 +777,130 @@ Graph* Graph::agmPrim(){
     return agm;
 }   
 
+void Graph::ordenaVetor(int* vSource, int* vTarget, float* peso, int tam){
+    int auxInicial, auxFinal;
+    float auxPeso;
 
-/*Graph* Graph::agmKuskal(){
-    //vector<int>* vertice = new vector<int>;
-    //vector<int>* aresta = new vector<int>;
+    //teste: usar contador invertido.
+    for (int i = 0; i < tam; i++) {
+        for (int j = 0; j < tam; j++) {
+            if(i != j){
+                if (peso[i] < peso[j]) {
+                    auxPeso = peso[i];
+                    peso[i] = peso[j];
+                    peso[j] = auxPeso;
 
-    list<Node>* vertice = new list<Node>;
+                    auxInicial = vSource[i];
+                    vSource[i] = vSource[j];
+                    vSource[j] = auxInicial;
 
-    //Percorrer grafo e armazenar arestas por ordem crescente de pesos.
-    Edge* menorPeso;
-    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
-        menorPeso = nullptr;
-        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
-            if(edge->getWeight() < menorPeso->getWeight()){
-                //menorPeso = edge->getWeight();
-            }   
+                    auxFinal = vTarget[i];
+                    vTarget[i] = vTarget[j];
+                    vTarget[j] = auxFinal;
+                }
+            } 
         }
-
     }
-}*/
+}
+
+bool Graph::verificaAresta(int* vSource, int* vTarget, int id, int id_target, int tam){
+    int indice_id = -1, indice_target = -1;
+    for(int i = 0 ; i < tam; i++){
+        if(vSource[i] == id_target) {
+            indice_id = i;
+            break;
+        }
+    }
+    if(indice_id != -1){
+        if(vTarget[ indice_id ] == id)
+            return true;
+    } else
+        return false;
+    return false;
+}
+
+Graph* Graph::agmKuskal(){
+    //Instanciando grafo de retorno.
+    Graph* kruskal = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+
+    int* vSource = new int [ this->getNumberEdges()];
+    int* vTarget = new int [ this->getNumberEdges() ];
+    float* peso = new float [ this->getNumberEdges() ];
+
+    //Preencher vetores com as arestas e pesos.
+    int cont = 0, i = 0;
+    //cout << "TAMANHO: " << this->getOrder() << endl;
+    //cout << "TAMANHO: " << this->getNumberEdges() << endl;
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        
+        //Grafo de retorno armazena inicialmente apenas vertices sem arestas.
+        kruskal->insertNode( node->getId() );
+        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){            
+            if( !verificaAresta(vSource, vTarget, node->getId(), edge->getTargetId(), i) ){
+                //cout << "2 if" << endl;
+                vSource[i] = node->getId();
+                vTarget[i] = edge->getTargetId();
+                peso[i] = edge->getWeight();
+                i++;
+            }
+            //cont++;
+        }
+    }
+    //cout << "NUMERO DE ARESTAS: " << /*this->getNumberEdges() <<*/ endl;
+    
+    /*for (int j = 0; j < i; j++)
+    {
+        cout << vSource[j] << "\t" << vTarget[j] << "\t" << peso[j] << endl;
+    }
+    cout << endl;*/
+    
+
+    //Ordenar arestas por ordem crescente de pesos.
+    ordenaVetor(vSource, vTarget, peso, i);
+    //cout << "ARESTAS ORDENADAS" << endl;
+
+    /*for (int j = 0; j < i; j++)
+    {
+        cout << vSource[j] << "\t";
+    }
+    cout << endl;
+    
+    for (int j = 0; j < i; j++)
+    {
+        cout << vTarget[j] << "\t";
+    }
+    cout << endl;
+
+    for (int j = 0; j < i; j++)
+    {
+        cout << peso[j] << "\t";
+    }
+    cout << endl;*/
+
+    i = 0;
+    cont = 0;
+
+    //Insere as asrestas no grafo de retorno.
+    while( cont < kruskal->getOrder() && i < this->getNumberEdges() ){
+        int u, v, p;
+        u = vSource[i];
+        v = vTarget[i];
+        p = peso[i];
+
+        //Restorna todos os vertices que u alcança.
+        list<int>* aux = kruskal->fechoDireto(u);
+
+        //Verificar se u já alcança v, senão adiciona aresta conectando os dois vertices.
+        if( !aux->empty() ){
+            if( !pesquisaNaLista( aux, v) ){
+                kruskal->getNode(u)->insertEdge(v, p);
+                cont++;
+            }
+        } else {
+            kruskal->insertEdge(u, v, p);
+            cont++;            
+        }
+        i++;
+    }
+    return kruskal;
+}

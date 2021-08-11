@@ -46,8 +46,8 @@ class Graph{
         void incrementNumberEdges();
 
         //methods phase1
-        void fechoDireto(int id);
-        void fechoIndireto(int id);
+        list<int>* fechoDireto(int id);
+        list<int>* fechoIndireto(int id);
         Graph* caminhoProfund(int id);
         list<int>* topologicalSorting();
         //void breadthFirstSearch(ofstream& output_file);
@@ -55,7 +55,7 @@ class Graph{
         Graph* agmKuskal();
         Graph* agmPrim();
         float floydMarshall(int idSource, int idTarget);
-        float dijkstra(int idSource, int idTarget);
+        float dijkstra(int idSource, int idTarget, list<int>* vVisitado);
 
         //methods phase1
         float greed();
@@ -71,7 +71,9 @@ class Graph{
         bool buscaVetor(int* listIdNodes, int id, int ordem);
         int retornaIndice(int j, vector<int>* vertice);   
         bool cicloGrafo(int id, list<int>* lista, list<int>* pilha);
-        void ordenaVetor(vector<int>* vertice, vector<int>* aresta);
+        void ordenaVetor(int* vSource, int* vTarget, float* peso, int tam);
+        int posicaoNode(int id);
+        bool verificaAresta(int* vSource, int* vTarget, int id, int id_target, int i);
 };
 
 #endif // GRAPH_H_INCLUDED

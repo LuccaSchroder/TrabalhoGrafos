@@ -136,22 +136,50 @@ void imprimeGrafo(Graph* graph){
 //Funcao auxiliar fecho transitivo direto.
 void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     int vertice;
+    list<int>* fecho;
+    list<int>::iterator it;
 
     cout << "Digite o ID do vertice: " << endl;
     cin >> vertice; 
 
-    graph->fechoDireto(vertice);
+    fecho = graph->fechoDireto(vertice);
+
+    int opcao;
+    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+    cin >> opcao;
+    
+    if(opcao){
+        output_file << "Fecho Transitivo(" << vertice << ") = { ";
+        for(it = fecho->begin(); it != fecho->end(); it++){
+            output_file << *it << " ";
+        }
+        output_file << "}";
+    }
     
 }
 
 //Funcao auxiliar fecho transitivo indireto.
 void verticeTransitivoIndireto(Graph* graph, ofstream& output_file) {
     int vertice;
+    list<int>* fecho;
+    list<int>::iterator it;
 
     cout << "Digite o ID do vertice: " << endl;
     cin >> vertice; 
 
-    graph->fechoIndireto(vertice);
+    fecho = graph->fechoIndireto(vertice);
+
+    int opcao;
+    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+    cin >> opcao;
+    
+    if(opcao){
+        output_file << "Fecho Intransitivo(" << vertice << ") = { ";
+        for(it = fecho->begin(); it != fecho->end(); it++){
+            output_file << *it << " ";
+        }
+        output_file << "}";
+    }
     
 }
 
@@ -191,11 +219,25 @@ void caminhoProfund(Graph* graph, ofstream& output_file){
 
 void ordenacaoTopologica(Graph* graph, ofstream& output_file){
     list<int>* ordem;
+    list<int>::iterator it;
     
     ordem = graph->topologicalSorting();
     
-    for (list<int>::iterator it = ordem->begin(); it != ordem->end(); it++) {
+    for(it = ordem->begin(); it != ordem->end(); it++){
         cout << *it << " ";
+    }
+    cout << endl;
+
+    int opcao;
+    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+    cin >> opcao;
+    
+    if(opcao){
+        output_file << "Ordenação Topológica" << " = { ";
+        for(it = ordem->begin(); it != ordem->end(); it++){
+            output_file << *it << " ";
+        }
+        output_file << "}";
     }
     cout << endl;
 }
@@ -207,26 +249,55 @@ void caminhoMinFloyd(Graph* graph, ofstream& output_file){
     cin >> a >> b;
 
     float cam = graph->floydMarshall(a, b);
-    cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
+    //cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
+
+    if(cam == 10000){
+        cout << "Não existe caminho entre os dois vertices" << endl;
+    } else {
+        cout << "O valor caminho mínimo entre os dois vertices é " << cam << endl << endl;
+        int opcao;
+        cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+        cin >> opcao;
+
+        if(opcao){
+            output_file << "Caminho minimo(" << a << ", " << b << ") = " << cam;
+        }
+    }
 }
 
 void caminhoMinDijkstra(Graph* graph, ofstream& output_file){
     int a, b;
+    list<int>* vVisitado = new list<int>;
+    int opcao;
+    list<int>::iterator it;
 
     cout << "Digite o ID dos vertices: " << endl;
     cin >> a >> b;
 
-    float cam = graph->dijkstra(a, b);
+    float cam = graph->dijkstra(a, b, vVisitado);
     if(cam == 100000){
         cout << "Não existe caminho entre os dois vertices" << endl;
-    }else
-        cout << "O caminho mínimo entre os dois vertices é " << cam << endl << endl;
+    } else {
+        cout << "O valor caminho mínimo entre os dois vertices é " << cam << endl << endl;
+        int opcao;
+        cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+        cin >> opcao;
+
+        if(opcao){
+            output_file << "Caminho minimo(" << a << ", " << b << ") = { ";
+            for(it = vVisitado->begin(); it != vVisitado->end(); it++){
+                output_file << *it << " ";
+            }
+            output_file << "}";
+        }
+    }        
+     
 }
 
 //Função auxiliar algoritmo de Prim.
 void auxAgmPrim(Graph* graph, ofstream& output_file){
     Graph* prim;
-    /*int quantVertices;
+    int quantVertices;
     
     cout << "Quantos vertice?" << endl;
     cin >> quantVertices;
@@ -239,16 +310,42 @@ void auxAgmPrim(Graph* graph, ofstream& output_file){
     }
 
     prim = graph->getVertexInduced(listIdNodes, quantVertices);
-    prim = prim->agmPrim();*/
-    prim = graph->agmPrim();
-    imprimeGrafo(prim);
+    prim = prim->agmPrim();
+    //prim = graph->agmPrim();
+    if(prim != nullptr)
+        imprimeGrafo(prim);
+    int opcao;
+    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+    cin >> opcao;
+
+    if(opcao) escreveArquivo(prim, output_file);
 }
 
 void auxAgmKruscal(Graph* graph, ofstream& output_file){
     Graph* kruscal;
 
-    //kruscal = graph->agmKuskal();
-    imprimeGrafo( kruscal );
+    int quantVertices;
+    
+    cout << "Quantos vertice?" << endl;
+    cin >> quantVertices;
+    
+    int* listIdNodes = new int [quantVertices];
+
+    cout << "Digite o ID dos vertices" << endl;
+    for(int i = 0; i < quantVertices; i++){
+        cin >> listIdNodes[i];
+    }
+
+    kruscal = graph->getVertexInduced(listIdNodes, quantVertices);
+    kruscal = kruscal->agmPrim();
+    //prim = graph->agmPrim();
+    if(kruscal != nullptr)
+        imprimeGrafo(kruscal);
+    int opcao;
+    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+    cin >> opcao;
+
+    if(opcao) escreveArquivo(kruscal, output_file);
 }
 
 int menu(){
