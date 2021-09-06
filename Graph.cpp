@@ -897,13 +897,7 @@ Graph* Graph::agmKruskal(){
     return kruskal;
 }
 
-Graph* Graph::PAGMGKruskal(){
-    //Instanciando grafo de retorno e vetores para armazenar as arestas.
-    Graph* PAGMG = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
-
-    int* vSource = new int [ this->getNumberEdges()];
-    int* vTarget = new int [ this->getNumberEdges()];
-    float* peso = new float [ this->getNumberEdges()];
+int Graph::preencheVetorPAGMG(Graph* PAGMG, int* vSource, int* vTarget, float* peso){
 
     int i = 0;
 
@@ -925,7 +919,18 @@ Graph* Graph::PAGMGKruskal(){
                     i++;
             }
         }
-    } 
+    }
+    return i; 
+}
+
+float Graph::agmGuloso(Graph* PAGMG){
+    //s armazana a soma dos pesos da arestas do grafo PAGMG.
+    float s = 0;
+    int* vSource = new int [ this->getNumberEdges()];
+    int* vTarget = new int [ this->getNumberEdges()];
+    float* peso = new float [ this->getNumberEdges()];
+
+    int i = preencheVetorPAGMG(PAGMG, vSource, vTarget, peso);
 
     //Ordenar arestas por ordem crescente de pesos.
     ordenaVetor(vSource, vTarget, peso, i);
@@ -955,6 +960,7 @@ Graph* Graph::PAGMGKruskal(){
                 v->setInserted(true);
 
                 PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
+                s = s + p;
 
                 if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
                 if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
@@ -967,12 +973,14 @@ Graph* Graph::PAGMGKruskal(){
                         list<int>* fechoIn = PAGMG->fechoIndireto(u->getId());
                         if( !pesquisaNaLista(fechoIn, v->getId()) ){
                             PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
+                            s = s + p;
 
                             if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
                             if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
                         }
                     } else {
                         PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
+                        s = s + p;
 
                         if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
                         if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
@@ -984,23 +992,107 @@ Graph* Graph::PAGMGKruskal(){
     }
 
     reloadInserted();   
-    return PAGMG;
+    return s;
+}
+
+float Graph::agmGulosoRand(Graph* PAGMG){
+        //s armazana a soma dos pesos da arestas do grafo PAGMG.
+    float s = 0;
+    int* vSource = new int [ this->getNumberEdges()];
+    int* vTarget = new int [ this->getNumberEdges()];
+    float* peso = new float [ this->getNumberEdges()];
+
+    int i = preencheVetorPAGMG(PAGMG, vSource, vTarget, peso);
+
+    //Ordenar arestas por ordem crescente de pesos.
+    ordenaVetor(vSource, vTarget, peso, i);
+    
+    //Vetor que armazena vertice selecionado de cada grupo.
+    int* grupo = new int [ this->getNGrupo() ];
+    
+    //Variavel armazena quantidade de grupos.
+    int num = this->getNGrupo();
+
+    for(int i = 0; i < num; i++){
+        grupo[i] = 0;
+    }
+
+    int cont = 0;
+    i = 0;
+    int p = 0;
+
+    while( num > 1 || i < this->getNumberEdges()){
+        Node* u = getNode(vSource[i]);
+        Node* v = getNode(vTarget[i]);
+        p = peso[i];
+
+        if(( grupo[u->getGrupo() - 1] == 0 || grupo[u->getGrupo() - 1] == u->getId() ) && ( grupo[v->getGrupo() - 1] == 0 || grupo[v->getGrupo() - 1] == v->getId() )){
+            if( !u->getInserted() ||  !v->getInserted() ){
+                u->setInserted(true);
+                v->setInserted(true);
+
+                PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
+                s = s + p;
+
+                if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
+                if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
+            } else {
+               
+                list<int>* fechoDi = PAGMG->fechoDireto(u->getId());
+                
+                if( !pesquisaNaLista(fechoDi, v->getId()) )
+                    if(PAGMG->getDirected()){
+                        list<int>* fechoIn = PAGMG->fechoIndireto(u->getId());
+                        if( !pesquisaNaLista(fechoIn, v->getId()) ){
+                            PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
+                            s = s + p;
+
+                            if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
+                            if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
+                        }
+                    } else {
+                        PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
+                        s = s + p;
+
+                        if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
+                        if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
+                    }
+            }
+            num = num -1;   
+        }
+        i++;
+    }
+
+    reloadInserted();   
+    return s;
 }
 
 float Graph::greed(ofstream& output_file){
-    Graph* guloso;
-    guloso = PAGMGKruskal();
+    //Instanciando grafo de retorno e vetores para armazenar as arestas.
+    Graph* guloso = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());;
+    float s = agmGuloso(guloso);
+    cout << "SOMA DAS ARESTAS DA PAGMG: " << s << endl;
     escreveArquivo(guloso, output_file);
 
     return 0;
 }
 
-float Graph::greedRandom(){
+float Graph::greedRandom(float alfa, int interacoes, ofstream& output_file){
+    //Instanciando grafo de retorno e vetores para armazenar as arestas.
+    Graph* guloso = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());;
     
+    int i = 1, k;
+    float solbest, s;
+
+    while(i < interacoes){
+        float s = agmGulosoRand(guloso);
+        i++;
+    }
+
+
 }
 
 void Graph::imprimeAGMGeneralizada(){
-
     for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
         cout << "--------------------AGM GENERALIZADA--------------------" << endl;
         cout << node->getId() << " " << node->getGrupo() << endl;
