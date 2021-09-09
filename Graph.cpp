@@ -12,6 +12,8 @@
 #include <float.h>
 #include <iomanip>
 #include <algorithm>
+#include <time.h>
+#include <random>
 
 using namespace std;
 
@@ -79,14 +81,12 @@ bool Graph::getWeightedEdge()
 
     return this->weighted_edge;
 }
-
 //Function that verifies if the graph is weighted at the nodes
 bool Graph::getWeightedNode()
 {
 
     return this->weighted_node;
 }
-
 
 Node *Graph::getFirstNode()
 {
@@ -100,8 +100,7 @@ Node *Graph::getLastNode()
     return this->last_node;
 }
 
-Node *Graph::getNode(int id)
-{
+Node *Graph::getNode(int id) {
     if(this->searchNode(id)){
         for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
             if(aux->getId() == id)
@@ -128,6 +127,7 @@ void Graph::incrementNumberEdges(){
     The outdegree attribute of nodes is used as a counter for the number of edges in the graph.
     This allows the correct updating of the numbers of edges in the graph being directed or not.
 */
+
 void Graph::insertNode(int id, int grupo)
 {   
     // Verifica se ja existe algum vertice no grafo.
@@ -188,7 +188,6 @@ bool Graph::searchNode(int id)
     return false;
 }
 
-//Imprime uma lista do tipo list.
 void Graph::imprimeLista (list<int>* lista){
     list<int>::iterator it;
 
@@ -243,7 +242,6 @@ list<int>* Graph::fechoDireto(int id){
     
     return lista;
 }
-
 
 void Graph::auxFechoIndireto(list<int>* lista, list<int>* pilha, list<int>* visitado, Node* node, int id) { 
 
@@ -429,7 +427,6 @@ int Graph::posicaoNode(int id){
     return 0;
 }
 
-//function that prints a topological sorting
 list<int>* Graph::topologicalSorting(){
     //lista de retorno.
     list<int>* ordem = new list<int>;
@@ -490,7 +487,6 @@ list<int>* Graph::topologicalSorting(){
 
     return ordem; 
 }
-
 
 float Graph::floydMarshall(int idSource, int idTarget){
     float inf = numeric_limits<float>::max();
@@ -562,7 +558,6 @@ float Graph::floydMarshall(int idSource, int idTarget){
 
     return matriz[ retornaIndice(idSource, vertice) ][ retornaIndice(idTarget, vertice) ];
 }
-
 
 float Graph::dijkstra(int idSource, int idTarget, list<int>* vVisitado){
 
@@ -788,15 +783,15 @@ void Graph::ordenaVetor(int* vSource, int* vTarget, float* peso, int tam){
     int auxInicial, auxFinal;
     float auxPeso;
 
-    //teste: usar contador invertido.
     for (int i = 0; i < tam; i++) {
         for (int j = 0; j < tam; j++) {
             if(i != j){
                 if (peso[i] < peso[j]) {
+
                     auxPeso = peso[i];
                     peso[i] = peso[j];
                     peso[j] = auxPeso;
-
+                    
                     auxInicial = vSource[i];
                     vSource[i] = vSource[j];
                     vSource[j] = auxInicial;
@@ -846,10 +841,10 @@ Graph* Graph::agmKruskal(){
                 } 
                 
             } else {
-                    vSource[i] = node->getId();
-                    vTarget[i] = edge->getTargetId();
-                    peso[i] = edge->getWeight();
-                    i++;
+                vSource[i] = node->getId();
+                vTarget[i] = edge->getTargetId();
+                peso[i] = edge->getWeight();
+                i++;
             }
         }
     } 
@@ -897,44 +892,42 @@ Graph* Graph::agmKruskal(){
     return kruskal;
 }
 
-int Graph::preencheVetorPAGMG(Graph* PAGMG, int* vSource, int* vTarget, float* peso){
+void Graph::preencheVetorPAGMG(int* vSource, int* vTarget, float* peso){
 
     int i = 0;
 
     for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
-        //Grafo de retorno armazena inicialmente apenas vertices sem arestas.
-        PAGMG->insertNode( node->getId(), node->getGrupo() );
-        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
-            if(!PAGMG->getDirected()){
-                if( !verificaAresta(vSource, vTarget, node->getId(), edge->getTargetId(), i+1) ){
+        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){         
+            if(!this->getDirected()){
+                if( !verificaAresta(vSource, vTarget, node->getId(), edge->getTargetId(), i) ){
                     vSource[i] = node->getId();
                     vTarget[i] = edge->getTargetId();
                     peso[i] = edge->getWeight();
                     i++;
                 } 
+                
             } else {
-                    vSource[i] = node->getId();
-                    vTarget[i] = edge->getTargetId();
-                    peso[i] = edge->getWeight();
-                    i++;
+                vSource[i] = node->getId();
+                vTarget[i] = edge->getTargetId();
+                peso[i] = edge->getWeight();
+                i++;
             }
         }
     }
-    return i; 
 }
 
 float Graph::agmGuloso(Graph* PAGMG){
     //s armazana a soma dos pesos da arestas do grafo PAGMG.
     float s = 0;
-    int* vSource = new int [ this->getNumberEdges()];
-    int* vTarget = new int [ this->getNumberEdges()];
-    float* peso = new float [ this->getNumberEdges()];
+    int* vSource = new int [this->getNumberEdges()];
+    int* vTarget = new int [this->getNumberEdges()];
+    float* peso = new float [this->getNumberEdges()];
 
-    int i = preencheVetorPAGMG(PAGMG, vSource, vTarget, peso);
-
-    //Ordenar arestas por ordem crescente de pesos.
-    ordenaVetor(vSource, vTarget, peso, i);
+    preencheVetorPAGMG(vSource, vTarget, peso);
     
+    //Ordenar arestas por ordem crescente de pesos.
+    ordenaVetor(vSource, vTarget, peso, this->getNumberEdges());
+
     //Vetor que armazena vertice selecionado de cada grupo.
     int* grupo = new int [ this->getNGrupo() ];
     
@@ -946,7 +939,7 @@ float Graph::agmGuloso(Graph* PAGMG){
     }
 
     int cont = 0;
-    i = 0;
+    int i = 0;
     int p = 0;
 
     while( num > 1 || i < this->getNumberEdges()){
@@ -995,21 +988,28 @@ float Graph::agmGuloso(Graph* PAGMG){
     return s;
 }
 
-float Graph::agmGulosoRand(Graph* PAGMG){
-        //s armazana a soma dos pesos da arestas do grafo PAGMG.
-    float s = 0;
-    int* vSource = new int [ this->getNumberEdges()];
-    int* vTarget = new int [ this->getNumberEdges()];
-    float* peso = new float [ this->getNumberEdges()];
+void Graph::constroiLCR(vector<Edge>* aresta, int* vSource, int* vTarget, float* peso){
+    for(int i = 0; i < this->getNumberEdges(); i++){
+        Edge* aux = new Edge(vTarget[i], vSource[i]);
+        aux->setWeight(peso[i]);
+        aresta->push_back(*aux);
+    }
+}
 
-    int i = preencheVetorPAGMG(PAGMG, vSource, vTarget, peso);
+Graph* Graph::agmGulosoRand(float* s, float alfa){
+    Graph* PAGMG = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+    //s armazana a soma dos pesos da arestas do grafo PAGMG.
+    *s = 0;
+    int* vSource = new int [this->getNumberEdges()];
+    int* vTarget = new int [this->getNumberEdges()];
+    float* peso = new float [this->getNumberEdges()];
+    vector<Edge>* aresta = new vector<Edge>;
 
+    preencheVetorPAGMG(vSource, vTarget, peso);
     //Ordenar arestas por ordem crescente de pesos.
-    ordenaVetor(vSource, vTarget, peso, i);
-    
+    ordenaVetor(vSource, vTarget, peso, this->getNumberEdges());
     //Vetor que armazena vertice selecionado de cada grupo.
     int* grupo = new int [ this->getNGrupo() ];
-    
     //Variavel armazena quantidade de grupos.
     int num = this->getNGrupo();
 
@@ -1018,13 +1018,22 @@ float Graph::agmGulosoRand(Graph* PAGMG){
     }
 
     int cont = 0;
-    i = 0;
-    int p = 0;
-
+    int i = 0;
+    float p = 0;
+    int k;
+    constroiLCR(aresta, vSource, vTarget, peso);
+    vector<Edge>::pointer edge;
     while( num > 1 || i < this->getNumberEdges()){
-        Node* u = getNode(vSource[i]);
-        Node* v = getNode(vTarget[i]);
-        p = peso[i];
+        int aux = (alfa*(aresta->size()-1));
+        
+        if (aux!= 0) k = rand() % (aux);
+        else k = 0;
+        
+        edge = &aresta->at(k);
+
+        Node* u = this->getNode(edge->getIdNode());
+        Node* v = this->getNode(edge->getTargetId());
+        p = edge->getWeight();
 
         if(( grupo[u->getGrupo() - 1] == 0 || grupo[u->getGrupo() - 1] == u->getId() ) && ( grupo[v->getGrupo() - 1] == 0 || grupo[v->getGrupo() - 1] == v->getId() )){
             if( !u->getInserted() ||  !v->getInserted() ){
@@ -1032,7 +1041,7 @@ float Graph::agmGulosoRand(Graph* PAGMG){
                 v->setInserted(true);
 
                 PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
-                s = s + p;
+                *s = *s + p;
 
                 if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
                 if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
@@ -1045,14 +1054,14 @@ float Graph::agmGulosoRand(Graph* PAGMG){
                         list<int>* fechoIn = PAGMG->fechoIndireto(u->getId());
                         if( !pesquisaNaLista(fechoIn, v->getId()) ){
                             PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
-                            s = s + p;
+                            *s = *s + p;
 
                             if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
                             if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
                         }
                     } else {
                         PAGMG->insertEdge(u->getId(), u->getGrupo(), v->getId(), p);
-                        s = s + p;
+                        *s = *s + p;
 
                         if(grupo[u->getGrupo() - 1] == 0) grupo[u->getGrupo() - 1] = u->getId();
                         if(grupo[v->getGrupo() - 1] == 0) grupo[v->getGrupo() - 1] = v->getId();
@@ -1060,36 +1069,151 @@ float Graph::agmGulosoRand(Graph* PAGMG){
             }
             num = num -1;   
         }
+        aresta->erase(aresta->begin() + k);
         i++;
     }
 
     reloadInserted();   
-    return s;
+    delete [] vSource;
+    delete [] vTarget;
+    delete [] peso;
+    delete aresta;
+    return PAGMG;
 }
 
-float Graph::greed(ofstream& output_file){
-    //Instanciando grafo de retorno e vetores para armazenar as arestas.
-    Graph* guloso = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());;
+void Graph::greed(ofstream& output_file){
+    float tempo;
+    time_t tInicial, tFinal;
+    
+    Graph* guloso = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+    tInicial = time(NULL);
     float s = agmGuloso(guloso);
-    cout << "SOMA DAS ARESTAS DA PAGMG: " << s << endl;
+    tFinal = time(NULL);
+    tempo = difftime(tFinal, tInicial);
+    cout << "Solucao: " << s << endl;
+    cout << "Tempo de Execucao do Algoritmo Guloso: " << tempo << endl;
     escreveArquivo(guloso, output_file);
-
-    return 0;
 }
 
 float Graph::greedRandom(float alfa, int interacoes, ofstream& output_file){
-    //Instanciando grafo de retorno e vetores para armazenar as arestas.
-    Graph* guloso = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());;
+    float tempo;
+    time_t tInicial, tFinal;
     
-    int i = 1, k;
-    float solbest, s;
+    Graph* guloso;
+    int i = 0, k;
+    float solbest = 10000000, s = 0;
 
+    tInicial = time(NULL);
     while(i < interacoes){
-        float s = agmGulosoRand(guloso);
+        cout << "Interacao: " << i << endl;
+        guloso = agmGulosoRand(&s, alfa); 
+        cout << "Valor de s: " << s << endl;
         i++;
+        if(s < solbest){
+            solbest = s;
+        }
     }
+    tFinal = time(NULL);
+    tempo = difftime(tFinal, tInicial);
+    cout << "Melhor Solucao: " << solbest << endl;
+    cout << "Tempo de Execucao do Algoritmo Guloso: " << tempo << endl;
+    escreveArquivo(guloso, output_file);
+    return solbest;
+}
 
+void Graph::inicializaMedia(float* media, float alfa[], int m){
+    float s = 0;
+    for(int i = 0; i < m; i++){
+        Graph* guloso = new Graph(this->getOrder(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+        guloso = agmGulosoRand(&s, alfa[i]);
+        media[i] = s/alfa[i];
+    } 
+}
 
+void Graph::inicializaProb(float* prob, int m){
+    for(int i = 0; i < m; i++){
+        prob[i] = (float) 1/m;
+    }
+} 
+
+float Graph::escolheAlfa(float* prob, float* alfa, int m, int* p){
+    mt19937 generator{rd()};
+    vector<float> aux(prob, prob+m);
+    discrete_distribution<int> dist{aux.begin(), aux.end()};
+    *p = dist(generator);
+    return alfa[*p];
+}
+
+void Graph::atualizarMedia(float* media, int* quant, float* s, int m){
+    for(int i = 0; i < m; i++){
+        if(quant[i] != 0){
+            media[i] = (float)(s[i])/(quant[i]);
+        }
+    }
+}
+
+void Graph::atualizaProbabilidades(float* prob, float* media, int m, float solbest){
+    float* q = new float [m];
+    float aux;
+    for(int i = 0; i < m; i++){
+        q[i] = pow((solbest/media[i]), 2);
+        aux = aux + q[i];
+    }
+    for(int i = 0; i < m; i++){
+        prob[i] = (q[i]/aux);
+    }
+}
+
+float Graph::greedRactiveRandom(float* alfa, int m, int interacoes, int bloco, ofstream& output_file){
+    float tempo;
+    time_t tInicial, tFinal;
+    
+    Graph* guloso;
+    int i = 0, k;
+    int posicao = 0; 
+    float solbest = 100000, s = 0, a = 0;
+    float* vet = new float [m];
+    int* quantAlfa = new int [m];
+
+    for(int i = 0; i < m; i++){
+        vet[i] = 0;
+        quantAlfa[i] = 0;
+    }
+    
+    float* media = new float [m];
+    float* prob = new float [m];
+    inicializaProb(prob, m);
+    inicializaMedia(media, alfa, m);
+
+    tInicial = time(NULL);
+    while(i < interacoes){
+        cout << "Interacao: " << i << endl;
+        if(i % bloco==0) {
+            atualizaProbabilidades(prob, media, m, solbest);
+            cout << "Probabilidade dos alfas: ";
+            for(int i = 0; i < m; i++){
+                cout << prob[i] << " ";
+            }
+            cout << endl;
+        }
+        a = escolheAlfa(prob, alfa, m, &posicao);
+        cout << "Valor de alfa: " << a << endl;
+        guloso = agmGulosoRand(&s, a); 
+        i++;
+        cout << "Solucao: " << s << endl;
+        vet[posicao] += s;
+        quantAlfa[posicao]++;
+        atualizarMedia(media, quantAlfa, vet, m);
+        if(s < solbest){
+            solbest = s;
+        }
+    }
+    tFinal = time(NULL);
+    tempo = difftime(tFinal, tInicial);
+    cout << "Melhor Solucao: " << solbest << endl;
+    cout << "Tempo de Execucao do Algoritmo Guloso: " << tempo << endl;
+    escreveArquivo(guloso, output_file);
+    return solbest;
 }
 
 void Graph::imprimeAGMGeneralizada(){
@@ -1116,9 +1240,10 @@ void Graph::escreveArquivo(Graph* graph, ofstream& output_file){
         for(Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
             for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
                 if(graph->getDirected())
-                        output_file <<  node->getId() << "->" << edge->getTargetId() << endl;
+                        output_file <<  node->getId() << " -> " << edge->getTargetId();
                     else
-                        output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
+                        output_file <<  node->getId() << " -- " << edge->getTargetId();
+                output_file << " [label = " << edge->getWeight() << "]" << endl;
             }
         }
         output_file << "}" << endl;

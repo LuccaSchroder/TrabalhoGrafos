@@ -18,27 +18,32 @@ class Node{
         Edge* first_edge; //Lista de arestas do vertice
         Edge* last_edge;
         int id;
+        int grupo;
         unsigned int in_degree; //grau de entrada
         unsigned int out_degree; //grau de saida
         float weight; //peso do vertice
         Node* next_node; //proximo vertice
+        bool inserted;
 
     public:
         // Constructor
-        Node(int id);
+        Node(int id, int grupo);
         // Destructor
         ~Node();
         // Getters
         Edge* getFirstEdge();
         Edge* getLastEdge();
         int getId();
+        int getGrupo();
         int getInDegree();
         int getOutDegree();
         float getWeight();
         Node* getNextNode();
+        bool getInserted();
         // Setters
         void setNextNode(Node* node);
         void setWeight(float weight);
+        void setInserted(bool inserted);
         // Other methods
         bool searchEdge(int target_id);
         bool insertEdge(int target_id, float weight);

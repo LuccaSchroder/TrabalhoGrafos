@@ -9,15 +9,17 @@ using namespace std;
 **************************************************************************************************/
 
 // Constructor
-Node::Node(int id){
+Node::Node(int id, int grupo){
 
     this->id = id;
+    this->grupo = grupo;
     this->in_degree = 0;
     this->out_degree = 0;
     this->weight = 0;
     this->first_edge = nullptr;
     this->last_edge = nullptr;
     this->next_node = nullptr;
+    this->inserted = false;
 
 };
 
@@ -55,6 +57,12 @@ int Node::getId(){
 
 }
 
+int Node::getGrupo(){
+
+    return this->grupo;
+
+}
+
 int Node::getInDegree(){
 
     return this->in_degree;
@@ -79,6 +87,12 @@ Node* Node::getNextNode(){
 
 }
 
+bool Node::getInserted(){
+
+    return this->inserted;
+
+}
+
 // Setters
 
 void Node::setNextNode(Node* next_node){
@@ -90,6 +104,12 @@ void Node::setNextNode(Node* next_node){
 void Node::setWeight(float weight){
 
     this->weight = weight;
+
+}
+
+void Node::setInserted(bool inserted){
+
+    this->inserted = inserted;
 
 }
 

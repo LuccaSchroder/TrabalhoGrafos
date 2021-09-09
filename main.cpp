@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <string>
 #include <math.h>
@@ -7,99 +8,141 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <chrono>
+#include <algorithm>
 #include "Graph.h"
 #include "Node.h"
 
 using namespace std;
-//teste
-Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
 
-    //Variáveis para auxiliar na criação dos nós no Grafo
+// Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
+
+//     //Variáveis para auxiliar na criação dos nós no Grafo
+//     int idNodeSource;
+//     int idNodeTarget;
+//     int order;
+
+//     //Pegando a ordem do grafo
+//     input_file >> order;
+
+//     //Criando objeto grafo
+//     Graph* graph = new Graph(order, directed, weightedEdge, weightedNode);
+
+//     //Leitura de arquivo
+
+//     if(!graph->getWeightedEdge() && !graph->getWeightedNode()){
+//         int c = 1;
+//         while(input_file >> idNodeSource >> idNodeTarget) {
+
+//             graph->insertEdge(idNodeSource, idNodeTarget, 0);
+
+//         }        
+
+//     }else if(graph->getWeightedEdge() && !graph->getWeightedNode() ){
+
+//         float edgeWeight;
+
+//         while(input_file >> idNodeSource >> idNodeTarget >> edgeWeight) {
+
+//             graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
+
+//         }
+
+//     }else if(graph->getWeightedNode() && !graph->getWeightedEdge()){
+
+//         float nodeSourceWeight, nodeTargetWeight;
+
+//         while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight) {
+
+//             graph->insertEdge(idNodeSource, idNodeTarget, 0);
+//             graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
+//             graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
+
+//         }
+
+//     }else if(graph->getWeightedNode() && graph->getWeightedEdge()){
+
+//         float nodeSourceWeight, nodeTargetWeight, edgeWeight;
+
+//         while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight) {
+
+//             graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
+//             graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
+//             graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
+
+//         }
+
+//     }
+
+//     return graph;
+// }
+
+Graph* leituraAGMG(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
     int idNodeSource;
     int idNodeTarget;
-    int order;
-
-    //Pegando a ordem do grafo
-    input_file >> order;
+    float edgeWeight;
+    int order = 0; 
+    int cont = 0;
+    int nGrupo = 0;
+    string linha;
 
     //Criando objeto grafo
     Graph* graph = new Graph(order, directed, weightedEdge, weightedNode);
 
-    //Leitura de arquivo
+    getline(input_file, linha);
 
-    if(!graph->getWeightedEdge() && !graph->getWeightedNode()){
-        int c = 1;
-        while(input_file >> idNodeSource >> idNodeTarget) {
+    while(!linha.empty()){
+        int aux;
+       
+        istringstream(linha) >> aux;
+        graph->insertNode(cont, aux);
+        cont++;
+        if(nGrupo < aux) nGrupo++;
 
-            graph->insertEdge(idNodeSource, idNodeTarget, 0);
-
-        }        
-
-    }else if(graph->getWeightedEdge() && !graph->getWeightedNode() ){
-
-        float edgeWeight;
-
-        while(input_file >> idNodeSource >> idNodeTarget >> edgeWeight) {
-
-            graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
-
-        }
-
-    }else if(graph->getWeightedNode() && !graph->getWeightedEdge()){
-
-        float nodeSourceWeight, nodeTargetWeight;
-
-        while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight) {
-
-            graph->insertEdge(idNodeSource, idNodeTarget, 0);
-            graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
-            graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
-
-        }
-
-    }else if(graph->getWeightedNode() && graph->getWeightedEdge()){
-
-        float nodeSourceWeight, nodeTargetWeight, edgeWeight;
-
-        while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight) {
-
-            graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
-            graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
-            graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
-
-        }
-
+        getline(input_file, linha);
     }
+
+    graph->setOrder(cont);
+    graph->setNGrupo(nGrupo);
+
+    while(!input_file.eof()){
+        input_file >> idNodeSource >> idNodeTarget >> edgeWeight;
+        graph->insertEdge(idNodeSource, graph->getNode(idNodeSource)->getGrupo(), idNodeTarget, edgeWeight);
+    }
+
+    cout << "Quantidade de Grupo no Grafo: " << nGrupo << endl;
+    cout << endl;
 
     return graph;
 }
 
-Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
+// Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
 
-    //Variáveis para auxiliar na criação dos nós no Grafo
-    int idNodeSource;
-    int idNodeTarget;
-    int order;
-    int numEdges;
+//     //Variáveis para auxiliar na criação dos nós no Grafo
+//     int idNodeSource;
+//     int idNodeTarget;
+//     int order;
+//     int numEdges;
 
-    //Pegando a ordem do grafo
-    input_file >> order >> numEdges;
+//     //Pegando a ordem do grafo
+//     input_file >> order >> numEdges;
 
-    //Criando objeto grafo
-    Graph* graph = new Graph(order, directed, weightedEdge, weightedNode);
+//     //Criando objeto grafo
+//     Graph* graph = new Graph(order, directed, weightedEdge, weightedNode);
 
-    //Leitura de arquivo
-    while(input_file >> idNodeSource >> idNodeTarget) {
+//     //Leitura de arquivo
+//     while(input_file >> idNodeSource >> idNodeTarget) {
 
-        graph->insertEdge(idNodeSource, idNodeTarget, 0);
+//         graph->insertEdge(idNodeSource, idNodeTarget, 0);
 
-    }
+//     }
 
-    return graph;
-}
+//     return graph;
+// }
+
+//------------------------------------FUNCOES AUXILIARES-----------------------------------------
 
 //Função para escrever no arquivo.
-void escreveArquivo(Graph* graph, ofstream& output_file){
+void escreveArquivoGrafo(Graph* graph, ofstream& output_file){
     
     if ( !graph->getDirected() ) 
         output_file << "strict graph {" << endl;
@@ -107,16 +150,15 @@ void escreveArquivo(Graph* graph, ofstream& output_file){
         output_file << "digraph graphname {" << endl;
 
     for(Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
-       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
-       {
-           if(graph->getDirected()){
-                cout << node->getId() << "->" << edge->getTargetId() << ";" << endl;
+       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+           if(graph->getDirected())
                 output_file <<  node->getId() << "->" << edge->getTargetId() << endl;
-            } else {
-                cout << node->getId() << "--" << edge->getTargetId() << ";" << endl;
+            else
                 output_file <<  node->getId() << "--" << edge->getTargetId() << endl;
-            }
        }
+    //    if(node->getInDegree() == 0 && node->getOutDegree() == 0){
+    //        output_file << node->getId() << endl;
+    //    }
     }
     output_file << "}" << endl;
 }
@@ -124,12 +166,19 @@ void escreveArquivo(Graph* graph, ofstream& output_file){
 //Função para imprimir grafo.
 void imprimeGrafo(Graph* graph){
 
-    cout << "Ordem: " << graph->getOrder() << endl;
-    cout << "Arestas " << endl;
-    for (Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
-        for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
-            cout << node->getId() << " " << edge->getTargetId() << endl; 
-        }
+    cout << "ORDEM: " << graph->getOrder() << endl;
+    cout << "VERTICES" << endl;
+    for(Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode())
+        cout << node->getId() << endl;
+
+    cout << "ARESTAS " << endl;
+    for(Node* node = graph->getFirstNode(); node != nullptr; node = node->getNextNode()){
+       for (Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+           if(graph->getDirected())
+                cout <<  node->getId() << "->" << edge->getTargetId() << endl;
+            else
+               cout <<  node->getId() << "--" << edge->getTargetId() << endl;
+       }
     }
 }
 
@@ -142,20 +191,27 @@ void verticeTransitivoDireto(Graph* graph, ofstream& output_file) {
     cout << "Digite o ID do vertice: " << endl;
     cin >> vertice; 
 
-    fecho = graph->fechoDireto(vertice);
+    if(!graph->getDirected())
+        cout << "O grafo nao e direcionado" << endl;
+    else{
+        fecho = graph->fechoDireto(vertice);
 
-    int opcao;
-    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
-    cin >> opcao;
+        cout << "Fecho Transitivo Direto(" << vertice << ") = { ";
+        for(it = fecho->begin(); it != fecho->end(); it++)
+            cout << *it << " ";
+        cout << "}" << endl;
+
+        int opcao;
+        cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+        cin >> opcao;
     
-    if(opcao){
-        output_file << "Fecho Transitivo(" << vertice << ") = { ";
-        for(it = fecho->begin(); it != fecho->end(); it++){
-            output_file << *it << " ";
+        if(opcao){
+            output_file << "Fecho Transitivo Direto(" << vertice << ") = { ";
+            for(it = fecho->begin(); it != fecho->end(); it++)
+                output_file << *it << " ";
+            output_file << "}";
         }
-        output_file << "}";
     }
-    
 }
 
 //Funcao auxiliar fecho transitivo indireto.
@@ -167,20 +223,27 @@ void verticeTransitivoIndireto(Graph* graph, ofstream& output_file) {
     cout << "Digite o ID do vertice: " << endl;
     cin >> vertice; 
 
-    fecho = graph->fechoIndireto(vertice);
+    if(!graph->getDirected())
+        cout << "O grafo nao e direcionado" << endl;
+    else{
+        fecho = graph->fechoIndireto(vertice);
 
-    int opcao;
-    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
-    cin >> opcao;
+        cout << "Fecho Transitivo Indireto(" << vertice << ") = { ";
+        for(it = fecho->begin(); it != fecho->end(); it++)
+            cout << *it << " ";
+        cout << "}" << endl;
+
+        int opcao;
+        cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+        cin >> opcao;
     
-    if(opcao){
-        output_file << "Fecho Intransitivo(" << vertice << ") = { ";
-        for(it = fecho->begin(); it != fecho->end(); it++){
-            output_file << *it << " ";
+        if(opcao){
+            output_file << "Fecho Transitivo Indireto (" << vertice << ") = { ";
+            for(it = fecho->begin(); it != fecho->end(); it++)
+                output_file << *it << " ";
+            output_file << "}";
         }
-        output_file << "}";
-    }
-    
+    } 
 }
 
 //Funcao auxiliar grafo vertice induzido.
@@ -200,6 +263,12 @@ void subgrafoInduzido(Graph* graph, ofstream& output_file){
 
     vInduzido = graph->getVertexInduced(listIdNodes, quantVertices);
     imprimeGrafo(vInduzido);
+
+    int opcao;
+    cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
+    cin >> opcao;
+
+    if(opcao) escreveArquivoGrafo(vInduzido, output_file);
     
     delete [] listIdNodes;
 }
@@ -214,7 +283,7 @@ void caminhoProfund(Graph* graph, ofstream& output_file){
 
     arvore = graph->caminhoProfund(vertice);
 
-    escreveArquivo(arvore, output_file);
+    escreveArquivoGrafo(arvore, output_file);
 }
 
 void ordenacaoTopologica(Graph* graph, ofstream& output_file){
@@ -318,7 +387,7 @@ void auxAgmPrim(Graph* graph, ofstream& output_file){
     cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
     cin >> opcao;
 
-    if(opcao) escreveArquivo(prim, output_file);
+    if(opcao) escreveArquivoGrafo(prim, output_file);
 }
 
 void auxAgmKruscal(Graph* graph, ofstream& output_file){
@@ -336,16 +405,53 @@ void auxAgmKruscal(Graph* graph, ofstream& output_file){
         cin >> listIdNodes[i];
     }
 
-    kruscal = graph->getVertexInduced(listIdNodes, quantVertices);
-    kruscal = kruscal->agmPrim();
-    //prim = graph->agmPrim();
+    //kruscal = graph->getVertexInduced(listIdNodes, quantVertices);
+    kruscal = graph->agmKruskal();
+
     if(kruscal != nullptr)
         imprimeGrafo(kruscal);
     int opcao;
     cout << "Salvar no arquivo?(sim(1)/nao(0))" << endl;
     cin >> opcao;
 
-    if(opcao) escreveArquivo(kruscal, output_file);
+    if(opcao) escreveArquivoGrafo(kruscal, output_file);
+}
+
+//Função auxiliar algoritmo guloso.
+void auxGuloso(Graph* graph, ofstream& output_file){
+    graph->greed(output_file);
+}
+
+void auxGulosoRand(Graph* graph, ofstream& output_file){
+    int numInt = 0;
+    float alfa = 0;
+
+    cout << "Digite valor de alfa: " << endl;
+    cin >> alfa;
+    cout << "Digite o numero de interacoes: " << endl;
+    cin >> numInt;
+
+    float aux = graph->greedRandom(alfa, numInt, output_file);
+}
+
+void auxGulosoRandReativo(Graph* graph, ofstream& output_file){
+    int numInt = 0, bloco = 0, aux = 0;
+
+    cout << "Digite a quantidade de alfa: ";
+    cin >> aux;
+    float* alfa = new float [aux];
+
+    cout << endl << "Digite os valores de alfa: ";
+    for(int i = 0; i < aux; i++){
+        cin >> alfa[i];
+    }
+    cout << endl << "Digite o numero de interacoes: ";
+    cin >> numInt;
+
+    cout << endl << "Digite o valor do bloco: ";
+    cin >> bloco;
+
+    float auxSolucao = graph->greedRactiveRandom(alfa, aux, numInt, bloco, output_file);
 }
 
 int menu(){
@@ -359,7 +465,7 @@ int menu(){
     cout << "[3] Caminho Mínimo entre dois vértices - Floyd" << endl;
     cout << "[4] Árvore Geradora Mínima de Prim" << endl;
     cout << "[5] Árvore Geradora Mínima de Kruskal" << endl;
-    cout << "[6] Imprimir caminhamento em largura" << endl;
+    cout << "[6] Imprimir caminhamento em largura (nao implementado)" << endl;
     cout << "[7] Imprimir ordenacao topológica" << endl;
     cout << "[8] Imprimir Fecho Transitivo Direto de um vertice" << endl;
     cout << "[9] Imprimir Fecho Transitivo Indireto de um vertice" << endl;
@@ -434,6 +540,18 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             caminhoProfund(graph, output_file);
             break;
         }
+        case 11:{
+            auxGuloso(graph, output_file);
+            break;
+        }
+        case 12:{
+            auxGulosoRand(graph, output_file);
+            break;
+        }
+        case 13:{
+            auxGulosoRandReativo(graph, output_file);
+            break;
+        }
         default:
         {
             cout << " Error!!! invalid option!!" << endl;
@@ -495,7 +613,7 @@ int main(int argc, char const *argv[]) {
     Graph* graph;
 
     if(input_file.is_open()){
-        graph = leitura(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
+        graph = leituraAGMG(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
 
     }else
         cout << "Unable to open " << argv[1];
