@@ -1182,10 +1182,10 @@ float Graph::greedRactiveRandom(float* alfa, int m, int interacoes, int bloco, o
     
     float* media = new float [m];
     float* prob = new float [m];
+    tInicial = time(NULL);
     inicializaProb(prob, m);
     inicializaMedia(media, alfa, m);
 
-    tInicial = time(NULL);
     while(i < interacoes){
         cout << "Interacao: " << i << endl;
         if(i % bloco==0) {
