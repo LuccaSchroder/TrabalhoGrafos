@@ -1,0 +1,24 @@
+Para executar o programa em linha de comando:
+./Grupo51.exe nomeArquivoEntrada.txt nomeArquivoSaida.dot 0 1 0
+
+
+Caso o exe Grupo51 não seja encontrado, executar:
+./TrabalhoGrafos.exe nomeArquivoEntrada.txt nomeArquivoSaida.dot 0 1 0
+
+
+Caso não seja encontrado nenhum arquivo exe, executar o comando:
+g++ *.cpp -o TrabalhoGrafos.exe -O3
+ou
+g++ *.cpp -o Grupo51.exe -O3
+
+
+---> OBS 1.: Os três números passados por prâmetro representam, respectivamente,
+se o grafo é direcionado, tem peso nas arestas ou peso nos vétices. Para executar
+os algoritmos gulosos é necessário manter o padrão 0 1 0. Caso contrário, a
+execução dos algoritmos gulosos apresentará erros.
+
+---> OBS 2.: O tipo de arquivo de saída pode ser escolhido, só alterar 
+o tipo na execução do programa na linha de comando.
+
+---> OBS 3.: Os arquivos de entrada (instâncias) a serem utilizados estão na pasta
+do programa.

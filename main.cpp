@@ -419,41 +419,55 @@ void auxAgmKruscal(Graph* graph, ofstream& output_file){
 
 //Função auxiliar algoritmo guloso.
 void auxGuloso(Graph* graph, ofstream& output_file){
-    graph->greed(output_file);
+    if(graph->getDirected()){
+        cout << "ERRO: Grafo direcionado. " << endl;
+        cout << "Para executar um dos Algoritmos gulosos e necessario que o grafo seja nao direcionado." << endl;
+    } else
+        graph->greed(output_file);
 }
-
+//Função auxiliar algoritmo guloso randomizado.
 void auxGulosoRand(Graph* graph, ofstream& output_file){
     int numInt = 0;
     float alfa = 0;
 
-    cout << "Digite valor de alfa: " << endl;
-    cin >> alfa;
-    cout << "Digite o numero de interacoes: " << endl;
-    cin >> numInt;
+    if(graph->getDirected()){
+        cout << "ERRO: Grafo direcionado. " << endl;
+        cout << "Para executar um dos Algoritmos gulosos e necessario que o grafo seja nao direcionado." << endl;
+    } else {
+       cout << "Digite valor de alfa: " << endl;
+        cin >> alfa;
+        cout << "Digite o numero de interacoes: " << endl;
+        cin >> numInt;
 
-    float aux = graph->greedRandom(alfa, numInt, output_file);
+        float aux = graph->greedRandom(alfa, numInt, output_file); 
+    }
 }
-
+//Função auxiliar algoritmo guloso randomizado reativo.
 void auxGulosoRandReativo(Graph* graph, ofstream& output_file){
     int numInt = 0, bloco = 0, aux = 0;
 
-    cout << "Digite a quantidade de alfa: ";
-    cin >> aux;
-    float* alfa = new float [aux];
+    if(graph->getDirected()){
+        cout << "ERRO: Grafo direcionado. " << endl;
+        cout << "Para executar um dos Algoritmos gulosos e necessario que o grafo seja nao direcionado." << endl;
+    } else {
+        cout << "Digite a quantidade de alfa: ";
+        cin >> aux;
+        float* alfa = new float [aux];
 
-    cout << endl << "Digite os valores de alfa: ";
-    for(int i = 0; i < aux; i++){
-        cin >> alfa[i];
+        cout << endl << "Digite os valores de alfa: ";
+        for(int i = 0; i < aux; i++){
+            cin >> alfa[i];
+        }
+        cout << endl << "Digite o numero de interacoes: ";
+        cin >> numInt;
+
+        cout << endl << "Digite o valor do bloco: ";
+        cin >> bloco;
+
+        float auxSolucao = graph->greedRactiveRandom(alfa, aux, numInt, bloco, output_file);
     }
-    cout << endl << "Digite o numero de interacoes: ";
-    cin >> numInt;
-
-    cout << endl << "Digite o valor do bloco: ";
-    cin >> bloco;
-
-    float auxSolucao = graph->greedRactiveRandom(alfa, aux, numInt, bloco, output_file);
 }
-
+    
 int menu(){
 
     int selecao;
