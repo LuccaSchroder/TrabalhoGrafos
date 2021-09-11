@@ -484,9 +484,9 @@ int menu(){
     cout << "[8] Imprimir Fecho Transitivo Direto de um vertice" << endl;
     cout << "[9] Imprimir Fecho Transitivo Indireto de um vertice" << endl;
     cout << "[10] Caminhamento em Profundidade" << endl;
-    cout << "[11] Algoritmo Guloso" << endl;
-    cout << "[12] Algoritmo Guloso Randomizado " << endl;
-    cout << "[13] Algoritmo Guloso Randomizado Reativo" << endl;
+    cout << "[11] Algoritmo Guloso para AGM Generalizada" << endl;
+    cout << "[12] Algoritmo Guloso Randomizado para AGM Generalizada" << endl;
+    cout << "[13] Algoritmo Guloso Randomizado Reativo para AGM Generalizada" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
